@@ -9,8 +9,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.mysite.travelo.Place;
-import com.mysite.travelo.PlaceRepository;
+import com.mysite.travelo.hyo.place.Place;
+import com.mysite.travelo.hyo.place.PlaceRepository;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

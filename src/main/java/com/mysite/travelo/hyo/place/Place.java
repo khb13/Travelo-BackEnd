@@ -1,4 +1,4 @@
-package com.mysite.travelo;
+package com.mysite.travelo.hyo.place;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
