@@ -1,4 +1,4 @@
-package com.mysite.travleo.yeon.member;
+package com.mysite.travelo.yeon.member;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +17,7 @@ public class Member {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer m_seq;
+	private Integer mSeq;
 	
 	@Column(nullable = false, unique = true)
 	private String username;

@@ -1,4 +1,4 @@
-package com.mysite.travleo;
+package com.mysite.travelo;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

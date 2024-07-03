@@ -1,4 +1,4 @@
-package com.mysite.travleo;
+package com.mysite.travelo;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

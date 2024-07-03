@@ -1,4 +1,4 @@
-package com.mysite.travleo;
+package com.mysite.travelo;
 
 public class DataNotFoundException extends RuntimeException {
 
