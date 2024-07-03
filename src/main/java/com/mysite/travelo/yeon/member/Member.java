@@ -29,9 +29,9 @@ public class Member {
 	private LocalDateTime registerDate;
 	
 	@Column(nullable = false, columnDefinition = "CHAR(1) default 'N'")
-	private String delYN;
+	private String delYn;
 	
 	@Column(nullable = false, columnDefinition = "CHAR(1) default 'N'")
-	private String adminYN;
+	private String adminYn;
 	
 }

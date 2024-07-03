@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>login/sign_up.html</title>
+</head>
+<body>
+
+	<div>
+		<div>
+		    <h5>회원가입</h5>
+		</div>
+	</div>
+    <form th:action="@{/yeon/signup}" th:object="${memberCreateForm}" method="post">
+        
+        <!-- 오류 표시할 내용 -->
+        <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
+        	<div th:each="err : ${#fields.allErrors()}" th:text="${err}"></div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="nickname" class="form-label">닉네임</label>
+            <input type="text" th:field="*{nickname}">
+        </div>
+        <input type="text" name="nickname" value="${email}"> 
+        <input type="submit" value="회원가입">
+    </form>
+
+</body>
+</html>
