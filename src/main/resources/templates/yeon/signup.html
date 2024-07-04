@@ -12,19 +12,17 @@
 		</div>
 	</div>
     <form th:action="@{/yeon/signup}" th:object="${memberCreateForm}" method="post">
-        
-        <!-- 오류 표시할 내용 -->
-        <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
-        	<div th:each="err : ${#fields.allErrors()}" th:text="${err}"></div>
-        </div>
-        
-        <div class="mb-3">
-            <label for="nickname" class="form-label">닉네임</label>
-            <input type="text" th:field="*{nickname}">
-        </div>
-        <input type="text" name="nickname" value="${email}"> 
-        <input type="submit" value="회원가입">
-    </form>
+	    <div>
+	        <label for="username">사용자명</label>
+	        <input type="text" th:field="*{username}" th:value="${memberCreateForm.username}" readonly>
+	    </div>
+	    <div>
+	        <label for="nickname">닉네임</label>
+	        <input type="text" id="nickname" th:field="*{nickname}">
+	        <div th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></div>
+	    </div>
+	    <input type="submit" value="회원가입">
+	</form>
 
 </body>
 </html>

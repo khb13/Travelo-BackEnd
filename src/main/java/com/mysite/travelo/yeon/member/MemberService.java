@@ -44,7 +44,7 @@ public class MemberService {
 	public void create(Map<String, String> map) {
 		
 		Member member = new Member();
-		member.setUsername(map.get("email"));
+		member.setUsername(map.get("username"));
 		member.setNickname(map.get("nickname"));
 		member.setRegisterDate(LocalDateTime.now());
 		member.setDelYn("N");

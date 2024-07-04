@@ -35,7 +35,7 @@ public class MemberController {
 	}
 	
 	@GetMapping("/kakao-callback")
-	public String kakaoCallback(@RequestParam String code, Model model, HttpSession httpSession) {
+	public String kakaoCallback(@RequestParam String code, HttpSession session) {
 
 		// RestTemplate 생성
         RestTemplate restTemplate = new RestTemplate();
@@ -82,16 +82,14 @@ public class MemberController {
         // 사용자 정보에서 이메일 추출
         String email = extractEmail(response2.getBody());
 
-        System.out.println(email + "---------------------------");
-
         Member oldMember = memberService.getMember(email);
         if (oldMember == null) {
-            model.addAttribute("email", email);
-            return "yeon/signup"; // 회원 가입 폼 뷰 파일 경로 반환
+        	session.setAttribute("email", email);
+            return "redirect:/yeon/signup"; // 회원 가입 폼 뷰 파일 경로 반환
         }
 
         // 세션에 사용자 정보 저장
-        httpSession.setAttribute("member", oldMember);
+        session.setAttribute("member", oldMember);
 
         // 응답 반환
         return "redirect:/";
@@ -99,23 +97,21 @@ public class MemberController {
 
     // JSON에서 이메일 추출하는 메서드
     private String extractEmail(String json) {
-        // 간단한 예시로 JSON 파싱을 직접 처리합니다.
-        // 여기서는 예시로 간단하게 문자열에서 이메일을 추출하는 방법을 사용합니다.
-        // 실제로는 JSON 라이브러리를 사용하여 객체로 변환하는 것이 더 안전하고 좋습니다.
-        // 이 예제에서는 간단하게 문자열에서 "@" 기호가 포함된 이메일 주소를 찾아 반환합니다.
         int startIndex = json.indexOf("\"email\":\"") + "\"email\":\"".length();
         int endIndex = json.indexOf("\"", startIndex);
         return json.substring(startIndex, endIndex);
     }
 
     @GetMapping("/yeon/signup")
-    public String signupForm(MemberCreateForm memberCreateForm, @RequestParam String email) {
-        memberCreateForm.setUsername(email); // 이메일을 username으로 설정
+    public String signup(MemberCreateForm memberCreateForm, Model model, HttpSession session) {
+    	String email = (String)session.getAttribute("email");
+        model.addAttribute("email", email);
+        memberCreateForm.setUsername(email);
         return "yeon/signup"; // 회원 가입 폼 뷰 파일 경로 반환
     }
 
     @PostMapping("/yeon/signup")
-    public String signup(@Valid MemberCreateForm memberCreateForm, BindingResult bindingResult) {
+    public String signup(@Valid MemberCreateForm memberCreateForm, BindingResult bindingResult, HttpSession session) {
         if (bindingResult.hasErrors()) {
             return "yeon/signup"; // 회원 가입 폼 뷰 파일 경로 반환
         }
@@ -145,6 +141,9 @@ public class MemberController {
             return "yeon/signup"; // 회원 가입 폼 뷰 파일 경로 반환
         }
 
+        Member oldMember = memberService.getMember(memberCreateForm.getUsername());
+        session.setAttribute("member", oldMember);
+        
         return "redirect:/"; // 회원 가입 성공 시 메인 페이지로 리다이렉트
     }
     

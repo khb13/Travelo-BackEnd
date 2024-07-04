@@ -15,20 +15,23 @@ public class Place {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer pSeq;
+	private Integer placeSeq;
 	
-	@Column(nullable = false, length = 2)
-	private String pAreaCode;
+	@Column(nullable = false, columnDefinition = "char(2)")
+	private String areaCode;
 	
-	@Column(nullable = false, length = 2)
+	@Column(nullable = false)
+	private String contentId;
+	
+	@Column(nullable = false, columnDefinition = "char(2)")
 	private String type;
 	
 	@Column(nullable = false, length = 200)
-	private String pTitle;
+	private String title;
 	
 	private String tel;
 	
-	@Column(nullable = false, length = 5)
+	@Column(nullable = false, columnDefinition = "char(5)")
 	private String zipCode;
 	
 	@Column(nullable = false, length = 255)
@@ -50,9 +53,12 @@ public class Place {
 	private String imageFile2;
 	
 	@Column(nullable = false, columnDefinition = "int default 0")
-	private Integer pViewCount;
+	private Integer viewCount;
 	
 	@Column(nullable = false, columnDefinition = "int default 0")
-	private Integer pLikeCount;
+	private Integer likeCount;
+	
+	@Column(nullable = false, columnDefinition = "char(2)")
+	private String district;
 	
 }
