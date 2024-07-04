@@ -15,16 +15,19 @@ public class Place {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer pSeq; // 장소 순차번호
+	private Integer placeSeq; // 장소 순차번호
 	
 	@Column(nullable = false, length = 2)
-	private String pAreaCode; // 지역 코드
+	private String areaCode; // 지역 코드
 	
 	@Column(nullable = false, length = 2)
 	private String type; // 콘텐츠 타입(유형)
+
+	@Column(nullable = false, length = 255)
+	private String contentId; // 콘텐츠 아이디 (장소 식별 번호)
 	
 	@Column(nullable = false, length = 200)
-	private String pTitle; //제목(장소명)
+	private String title; //제목(장소명)
 	
 	private String tel; // 전화번호
 	
@@ -52,8 +55,8 @@ public class Place {
 	private String imageFile2; // 대표 이미지(썸네일)
 	
 	@Column(nullable = false, columnDefinition = "int default 0")
-	private Integer pViewCount; // 조회수
+	private Integer viewCount; // 조회수
 	
 	@Column(nullable = false, columnDefinition = "int default 0")
-	private Integer pLikeCount; // 좋아요 수
+	private Integer likeCount; // 좋아요 수
 }
