@@ -4,50 +4,76 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.mysite.travelo.yeon.user.JWTFilter;
+import com.mysite.travelo.yeon.user.JWTUtil;
+import com.mysite.travelo.yeon.user.LoginFilter;
 
 import lombok.RequiredArgsConstructor;
 
+
+
 @Configuration
-@RequiredArgsConstructor
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
 public class SecurityConfig {
 
+	private final AuthenticationConfiguration configuration;
+    private final JWTUtil jwtUtil;
+	
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+
+        return configuration.getAuthenticationManager();
+    }
+    
 	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http
-			.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-				.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
-			.headers((headers) -> headers
-					.addHeaderWriter(new XFrameOptionsHeaderWriter(
-							XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
-			.formLogin((formLogin) -> formLogin
-					.loginPage("/user/login")
-					.defaultSuccessUrl("/"))
-			.logout((logout) -> logout
-					.logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
-					.logoutSuccessUrl("/")
-					.invalidateHttpSession(true));
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		// csrf disable 설정
+        http
+        	.csrf((auth) -> auth.disable());
+        
+        // 폼로그인 형식 disable 설정 => POSTMAN으로 검증할 것임!
+        http
+        	.formLogin((auth) -> auth.disable());
+        
+        // http basic 인증 방식 disable 설정
+        http
+        	.httpBasic((auth -> auth.disable()));
+
+        // 경로별 인가 작업
+        http
+        	.authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/yeon/join/form", "/yeon/login/form", "/").permitAll()
+                        .requestMatchers("/admin").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                );
+
+        // 세션 설정
+        http
+        	.sessionManagement((session) -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        
+        // 새로 만든 로그인 필터를 원래의 (UsernamePasswordAuthenticationFilter)의 자리에 넣음
+        http
+        	.addFilterAt(new LoginFilter(authenticationManager(configuration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+
+        // 로그인 필터 이전에 JWTFilter를 넣음
+        http
+        	.addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 		
 		return http.build();
-	}
+    }   
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-	
-	@Bean
-	AuthenticationManager authorizationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception { 
-		return authenticationConfiguration.getAuthenticationManager();
-	}
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 	
 }

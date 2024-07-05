@@ -5,11 +5,13 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class UserCreateForm {
+@NoArgsConstructor
+public class JoinRequest {
 
 	// 자동 증가 값
 	private Integer userSeq;
@@ -29,4 +31,13 @@ public class UserCreateForm {
 	
     @NotEmpty(message = "연락처 필수 항목입니다.")
 	private String tel;
+    
+    public SiteUser toEntity() {
+    	return SiteUser.builder()
+    			.username(this.username)
+    			.password(this.password1)
+    			.tel(this.tel)
+    			.role(UserRole.USER)
+    			.build();
+    }
 }

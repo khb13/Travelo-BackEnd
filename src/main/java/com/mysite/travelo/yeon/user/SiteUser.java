@@ -7,13 +7,19 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
-public class User {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SiteUser {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,4 +42,5 @@ public class User {
 	@Column(nullable = false, columnDefinition = "CHAR(1) default 'N'")
 	private String delYn;
 	
+	private UserRole role;
 }

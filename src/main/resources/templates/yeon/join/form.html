@@ -10,7 +10,7 @@
 		    <h5>회원가입</h5>
 		</div>
 	</div>
-    <form th:action="@{/user/signup}" th:object="${userCreateForm}" method="post">
+    <form th:action="@{/user/signup}" th:object="${joinRequest}" method="post">
         <!-- 오류 표시할 내용 -->
         <div role="alert" th:if="${#fields.hasAnyErrors()}">
         	<div th:each="err : ${#fields.allErrors()}" th:text="${err}"></div>
@@ -18,19 +18,23 @@
         
         <div>
             <label for="username">이메일</label>
-            <input type="text" th:field="*{username}">
+            <input type="text" th:field="*{username}" th:errorclass="error-input">
+            <div class="error-class" th:errors="*{username}"></div>
         </div>
         <div>
             <label for="password1" class="form-label">비밀번호</label>
-            <input type="password" th:field="*{password1}">
+            <input type="password" th:field="*{password1}" th:errorclass="error-input">
+             <div class="error-class" th:errors="*{password1}"></div>
         </div>
         <div>
             <label for="password2">비밀번호 확인</label>
-            <input type="password" th:field="*{password2}">
+            <input type="password" th:field="*{password2}" th:errorclass="error-input">
+             <div class="error-class" th:errors="*{password2}"></div>
         </div>
         <div>
             <label for="tel">연락처</label>
             <input type="text" th:field="*{tel}">
+             <div class="error-class" th:errors="*{tel}"></div>
         </div>
         <input type="submit" value="회원가입">
 	</form>

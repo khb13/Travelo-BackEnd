@@ -1,45 +1,55 @@
 package com.mysite.travelo.yeon.user;
 
-import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.mysite.travelo.DataNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
 
 	private final UserRepository userRepository;
-	private final PasswordEncoder passwordEncoder;
+	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	
-	public User getUser(String username) {
+	public boolean checkUsernameDuplicate(String username) {
+		return userRepository.existsByUsername(username);
+	}
+	
+	public void securityJoin(JoinRequest joinRequest) {
+		if (userRepository.existsByUsername(joinRequest.getUsername())) {
+			return;
+		}
 		
-		Optional<User> user = this.userRepository.findByUsername(username);
+		joinRequest.setPassword1(bCryptPasswordEncoder.encode(joinRequest.getPassword1()));
 		
-		if (user.isPresent()) {
-			return user.get();
-		} else {
+		userRepository.save(joinRequest.toEntity());
+	}
+	
+	public SiteUser login(LoginRequest loginRequest) {
+		Optional<SiteUser> findUser = userRepository.findByUsername(loginRequest.getUsername());
+		
+		if (findUser.get() == null) {
 			return null;
 		}
 		
+		if (!findUser.get().getPassword().equals(loginRequest.getPassword())) {
+			return null;
+		}
+		
+		return findUser.get();
 	}
 	
-	public void create(Map<String, String> map) {
+	public SiteUser getLoginUserByUsername(String username) {
+		if (username == null) return null;
 		
-		User user = new User();
-		user.setUsername(map.get("username"));
-		user.setPassword(passwordEncoder.encode(map.get("password")));
-		user.setTel(map.get("tel"));
-		user.setRegisterDate(LocalDateTime.now());
-		user.setDelYn("N");
-		this.userRepository.save(user);
-		
+		Optional<SiteUser> findUser = userRepository.findByUsername(username);
+		return findUser.orElse(null);
 	}
 	
 }
