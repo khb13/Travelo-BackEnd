@@ -36,10 +36,7 @@ class TraveloApplicationTests {
 
         for (int i = 0; i < 17; i++) {
             for (int j = 0; j < 6; j++) {
-                String urlString = "http://apis.data.go.kr/B551011/KorService1/areaBasedList1?serviceKey=x%2B0zQQWisDDkH80KSlVVK8w3Fefbbu9JZ644XFw74RptRvBCFLGh6iDWXDfCAH9Kgz0kUePR45JtZf1R90gKmw%3D%3D"
-                        + "&pageNo=1&numOfRows=100&MobileApp=AppTest&MobileOS=ETC&arrange=A"
-                        + "&contentTypeId=" + typeStr[j]
-                        + "&areaCode=" + areaStr[i];
+                String urlString = "";
 
                 try {
                     String apiResponse = apiCaller.callAPI(urlString);
