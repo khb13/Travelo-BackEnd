@@ -1,8 +1,8 @@
-package com.mysite.travelo.yeon.member;
+package com.mysite.travelo.yeon.user;
 
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class MemberController {
+public class UserController {
 
 }

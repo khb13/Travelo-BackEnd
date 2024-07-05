@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bookmark Test</title>
+    <script>
+        async function addBookmark() {
+            const userSeq = document.getElementById('userSeq').value;
+            const placeSeq = document.getElementById('placeSeq').value;
+            const response = await fetch(`/placebookmarks/add?userSeq=${userSeq}&placeSeq=${placeSeq}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert('Bookmark added successfully');
+            } else {
+                alert('Failed to add bookmark');
+            }
+        }
+
+        async function removeBookmark() {
+            const userSeq = document.getElementById('userSeq').value;
+            const placeSeq = document.getElementById('placeSeq').value;
+            const response = await fetch(`/placebookmarks/remove?userSeq=${userSeq}&placeSeq=${placeSeq}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert('Bookmark removed successfully');
+            } else {
+                alert('Failed to remove bookmark');
+            }
+        }
+
+        async function getBookmarks() {
+            const userSeq = document.getElementById('userSeq').value;
+            const response = await fetch(`/placebookmarks/all?userSeq=${userSeq}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const bookmarks = await response.json();
+                console.log(bookmarks);
+                alert('Check console for bookmarks');
+            } else {
+                alert('Failed to get bookmarks');
+            }
+        }
+    </script>
+</head>
+<body>
+<h1>Bookmark Test</h1>
+<div>
+    <label for="userSeq">User ID:</label>
+    <input type="text" id="userSeq" name="userSeq">
+</div>
+<div>
+    <label for="placeSeq">Place ID:</label>
+    <input type="text" id="placeSeq" name="placeSeq">
+</div>
+<div>
+    <button onclick="addBookmark()">Add Bookmark</button>
+    <button onclick="removeBookmark()">Remove Bookmark</button>
+    <button onclick="getBookmarks()">Get Bookmarks</button>
+</div>
+</body>
+</html>

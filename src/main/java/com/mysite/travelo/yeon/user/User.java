@@ -1,4 +1,4 @@
-package com.mysite.travelo.yeon.member;
+package com.mysite.travelo.yeon.user;
 
 import java.time.LocalDateTime;
 
@@ -9,22 +9,25 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
 @Setter
 @Entity
-public class Member {
+public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer mSeq;
+	private Integer UserSeq;
 	
 	@Column(nullable = false, unique = true)
 	private String username;
 	
 	@Column(nullable = false, unique = true)
 	private String nickname;
-	
+
+
+	@CreationTimestamp
 	@Column(nullable = false)
 	private LocalDateTime registerDate;
 

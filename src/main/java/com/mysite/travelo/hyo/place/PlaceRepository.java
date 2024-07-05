@@ -16,4 +16,6 @@ public interface PlaceRepository extends JpaRepository<Place, Integer>, JpaSpeci
     // contentId를 기반으로 가져옴. 기본 사용처: 거리 기반 검색
     Place findByContentId(String contentId);
 
+    Place findById(int placeSeq);
+
 }
