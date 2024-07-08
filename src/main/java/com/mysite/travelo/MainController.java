@@ -1,5 +1,6 @@
 package com.mysite.travelo;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,10 +12,9 @@ import com.mysite.travelo.yeon.user.LoginRequest;
 @Controller
 public class MainController {
 
-	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/")
-	public String index() {
-		return "hello";
+	public ResponseEntity<String> index() {
+		return ResponseEntity.ok("hello");
 	}
 	
 	@GetMapping("/user/join")
@@ -31,7 +31,7 @@ public class MainController {
 	@PreAuthorize("isAuthenticated()")
     @GetMapping("/admin")
     public String adminPage(Model model) {
-
+		
         return "인가 성공!";
     }
 	

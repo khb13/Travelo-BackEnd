@@ -1,14 +1,10 @@
 package com.mysite.travelo.yeon.user;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -16,11 +12,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequestMapping("/user")
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class UserController {
 
@@ -58,33 +56,62 @@ public class UserController {
     }
 	
 	@PostMapping("/login")
-    public String login(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
 
+		// del_yn이 Y인 사람은 존재하지 않는 회원
+		
         SiteUser user = userService.login(loginRequest);
 
         if(user == null){
-            return "이메일 또는 비밀번호가 일치하지 않습니다";
+            return ResponseEntity.ok("이메일 또는 비밀번호가 일치하지 않습니다");
         }
 
-        String token = jwtUtil.createJwt(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60L);
-        return token;
+        String accessToken = jwtUtil.createJwt(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60L);
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60 * 24 * 7);
+        
+        AuthResponse authResponse = new AuthResponse(accessToken, refreshToken);
+
+        return ResponseEntity.ok().body(authResponse);
+    }
+	
+    @PostMapping("/refreshToken")
+    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String refreshToken) {
+
+        if (refreshToken.startsWith("Bearer ")) {
+            refreshToken = refreshToken.substring(7);
+        }
+
+        if (jwtUtil.isExpired(refreshToken)) {
+            throw new RuntimeException("Refresh token is expired");
+        }
+
+        String username = jwtUtil.getUsername(refreshToken);
+        SiteUser user = userService.getLoginUserByUsername(username);
+
+        String accessToken = jwtUtil.createJwt(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60L);
+
+        AuthResponse authResponse = new AuthResponse(accessToken, refreshToken);
+
+        return ResponseEntity.ok().body(authResponse);
     }
 
+    // 토큰 값 받아와서 사용자 정보 추출
 	@GetMapping("/info")
     public String memberInfo(Authentication auth) {
-
 		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
 
-        return "ID : " + loginUser.getUsername() + "\nrole : " + loginUser.getRole();
+        return "email : " + loginUser.getUsername() + "\nrole : " + loginUser.getRole();
     }
     
     @PostMapping("/logout")
-    public String logout(@RequestHeader("Authorization") String token) {
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
+    public String logout(@RequestHeader("Authorization") String accessToken) {
+        if (accessToken.startsWith("Bearer ")) {
+        	accessToken = accessToken.substring(7);
         }
-        tokenBlacklistService.addToken(token);
+        
+        tokenBlacklistService.addToken(accessToken);
+        
         return "로그아웃 되었습니다";
     }
-	
+    
 }

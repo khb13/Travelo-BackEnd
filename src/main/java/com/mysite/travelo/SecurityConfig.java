@@ -44,7 +44,7 @@ public class SecurityConfig {
 	        .formLogin((auth) -> auth.disable())
 	        .httpBasic((auth -> auth.disable()))
 	        .authorizeHttpRequests((auth) -> auth
-	                .requestMatchers("/user/join", "/user/login", "yeon/join/form").permitAll()
+	                .requestMatchers("/**").permitAll()
 	                .requestMatchers("/user/admin").hasRole("ADMIN")
 	                .anyRequest().authenticated()
 	        )

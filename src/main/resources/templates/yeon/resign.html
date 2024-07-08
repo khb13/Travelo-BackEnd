@@ -2,24 +2,19 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>myPage</title>
+<title>resign</title>
 </head>
 <body>
+
 	<div>
 		<div>
-		    <h5>My Page</h5>
+		    <h5>회원 탈퇴</h5>
 		</div>
 	</div>
-    <form th:action="@{/user/mypage}" th:object="${joinRequest}" method="post">
+    <form th:action="@{/user/resign}" th:object="${resignRequest}" method="post">
         <!-- 오류 표시할 내용 -->
         <div role="alert" th:if="${#fields.hasAnyErrors()}">
         	<div th:each="err : ${#fields.allErrors()}" th:text="${err}"></div>
-        </div>
-        
-        <div>
-            <label for="username">이메일</label>
-            <input type="text" th:field="*{username}" th:errorclass="error-input" readOnly>
-            <div class="error-class" th:errors="*{username}"></div>
         </div>
         <div>
             <label for="password" class="form-label">비밀번호</label>
@@ -31,13 +26,7 @@
             <input type="password" th:field="*{passwordCheck}" th:errorclass="error-input">
              <div class="error-class" th:errors="*{passwordCheck}"></div>
         </div>
-        <div>
-            <label for="tel">전화번호</label>
-            <input type="text" th:field="*{tel}">
-             <div class="error-class" th:errors="*{tel}"></div>
-        </div>
-        <a href="/user/resign">회원 탈퇴하기</a>
-        <input type="submit" value="수정하기">
+        <input type="submit" value="탈퇴하기">
 	</form>
 
 </body>

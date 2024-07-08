@@ -65,4 +65,21 @@ public class UserService {
 		return findUser.orElse(null);
 	}
 	
+	// 수정
+	public void modify(JoinRequest joinRequest, SiteUser loginUser) {
+		joinRequest.setPassword(bCryptPasswordEncoder.encode(joinRequest.getPassword()));
+		
+		loginUser.setPassword(joinRequest.getPassword());
+		loginUser.setTel(joinRequest.getTel());
+		loginUser.setModifyDate(LocalDateTime.now());
+		
+		userRepository.save(loginUser);
+	}
+	
+	public void resign(SiteUser loginUser) {
+		loginUser.setDelYn("Y");
+		
+		userRepository.save(loginUser);
+	}
+	
 }
