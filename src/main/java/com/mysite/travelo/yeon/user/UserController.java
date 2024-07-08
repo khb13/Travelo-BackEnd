@@ -58,11 +58,9 @@ public class UserController {
 	@PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
 
-		// del_yn이 Y인 사람은 존재하지 않는 회원
-		
         SiteUser user = userService.login(loginRequest);
 
-        if(user == null){
+        if (user == null) {
             return ResponseEntity.ok("이메일 또는 비밀번호가 일치하지 않습니다");
         }
 
@@ -111,7 +109,7 @@ public class UserController {
         
         tokenBlacklistService.addToken(accessToken);
         
-        return "로그아웃 되었습니다";
+        return "redirect:/";
     }
     
 }

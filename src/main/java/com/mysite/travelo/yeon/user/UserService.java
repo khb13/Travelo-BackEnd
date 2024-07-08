@@ -43,7 +43,7 @@ public class UserService {
 	public SiteUser login(LoginRequest loginRequest) {
 		Optional<SiteUser> findUser = userRepository.findByUsername(loginRequest.getUsername());
 		
-		if (findUser.get() == null) {
+		if (findUser.isEmpty()) {
 			return null;
 		}
 		
@@ -81,5 +81,14 @@ public class UserService {
 		
 		userRepository.save(loginUser);
 	}
+	
+	public void resetPassword(ResignRequest resignRequest, SiteUser loginUser) {
+		resignRequest.setPassword(bCryptPasswordEncoder.encode(resignRequest.getPassword()));
+		
+		loginUser.setPassword(resignRequest.getPassword());
+		
+		userRepository.save(loginUser);
+	}
+	
 	
 }
