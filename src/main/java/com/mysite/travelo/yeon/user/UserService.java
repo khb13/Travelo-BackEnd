@@ -1,5 +1,6 @@
 package com.mysite.travelo.yeon.user;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,9 +27,17 @@ public class UserService {
 			return;
 		}
 		
-		joinRequest.setPassword1(bCryptPasswordEncoder.encode(joinRequest.getPassword1()));
+		joinRequest.setPassword(bCryptPasswordEncoder.encode(joinRequest.getPassword()));
 		
-		userRepository.save(joinRequest.toEntity());
+		SiteUser user = new SiteUser();
+		user.setUsername(joinRequest.getUsername());
+		user.setPassword(joinRequest.getPassword());
+		user.setTel(joinRequest.getTel());
+		user.setRole(UserRole.USER);
+		user.setRegisterDate(LocalDateTime.now());
+		user.setDelYn("N");
+		
+		userRepository.save(user);
 	}
 	
 	public SiteUser login(LoginRequest loginRequest) {
@@ -38,7 +47,11 @@ public class UserService {
 			return null;
 		}
 		
-		if (!findUser.get().getPassword().equals(loginRequest.getPassword())) {
+		if (!bCryptPasswordEncoder.matches(loginRequest.getPassword(), findUser.get().getPassword())) {
+			return null;
+		}
+		
+		if ("Y".equals(findUser.get().getDelYn())) {
 			return null;
 		}
 		

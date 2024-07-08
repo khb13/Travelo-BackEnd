@@ -13,7 +13,7 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
- // 현재 user의 role을 반환 (ex. "ROLE_ADMIN" / "ROLE_USER" 등)
+    // 현재 user의 role을 반환 (ex. "ROLE_ADMIN" / "ROLE_USER" 등)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> collection = new ArrayList<>();

@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class JWTFilter extends OncePerRequestFilter {
 
 	private final JWTUtil jwtUtil;
+	private final TokenBlacklistService tokenBlacklistService;	
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -40,6 +41,13 @@ public class JWTFilter extends OncePerRequestFilter {
         // Authorization에서 Bearer 접두사 제거
         String token = authorization.split(" ")[1];
 
+        // 토큰 블랙리스트 확인
+        if (tokenBlacklistService.isTokenBlacklisted(token)) {
+            System.out.println("token blacklisted");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+        
         // token 소멸 시간 검증
         // 유효기간이 만료한 경우
         if(jwtUtil.isExpired(token)){
