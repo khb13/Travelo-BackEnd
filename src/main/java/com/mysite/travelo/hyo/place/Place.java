@@ -13,46 +13,50 @@ import lombok.Setter;
 @Entity
 public class Place {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer pSeq;
-	
-	@Column(nullable = false, length = 2)
-	private String pAreaCode;
-	
-	@Column(nullable = false, length = 2)
-	private String type;
-	
-	@Column(nullable = false, length = 200)
-	private String pTitle;
-	
-	private String tel;
-	
-	@Column(nullable = false, length = 5)
-	private String zipCode;
-	
-	@Column(nullable = false, length = 255)
-	private String address;
-	
-	@Column(length = 100)
-	private String addressDetail;
-	
-	@Column(nullable = false, columnDefinition = "double(10, 6)")
-	private double latitude;
-	
-	@Column(nullable = false, columnDefinition = "double(10, 6)")
-	private double longitude;
-	
-	@Column(length = 255)
-	private String imageFile1;
-	
-	@Column(length = 255)
-	private String imageFile2;
-	
-	@Column(nullable = false, columnDefinition = "int default 0")
-	private Integer pViewCount;
-	
-	@Column(nullable = false, columnDefinition = "int default 0")
-	private Integer pLikeCount;
-	
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private Integer placeSeq; // 장소 순차번호
+   
+   @Column(nullable = false, length = 2)
+   private String areaCode; // 지역 코드
+   
+   @Column(nullable = false, length = 2)
+   private String type; // 콘텐츠 타입(유형)
+
+   @Column(nullable = false, length = 255)
+   private String contentId; // 콘텐츠 아이디 (장소 식별 번호)
+   
+   @Column(nullable = false, length = 200)
+   private String title; //제목(장소명)
+   
+   private String tel; // 전화번호
+   
+   @Column(nullable = false, length = 5)
+   private String zipCode; // 우편번호
+
+   private String district; // 시/도 구분
+   
+   @Column(nullable = false, length = 255)
+   private String address; // 주소
+   
+   @Column(length = 100)
+   private String addressDetail; // 상세주소
+   
+   @Column(nullable = false, columnDefinition = "double(10, 6)")
+   private double latitude; // 위도 좌표 y
+   
+   @Column(nullable = false, columnDefinition = "double(10, 6)")
+   private double longitude; // 경도 좌표 x
+   
+   @Column(length = 255)
+   private String imageFile1; // 대표 이미지(원본)
+   
+   @Column(length = 255)
+   private String imageFile2; // 대표 이미지(썸네일)
+   
+   @Column(nullable = false, columnDefinition = "int default 0")
+   private Integer viewCount; // 조회수
+   
+   @Column(nullable = false, columnDefinition = "int default 0")
+   private Integer likeCount; // 좋아요 수
 }
