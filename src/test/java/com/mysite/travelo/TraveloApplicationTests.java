@@ -58,7 +58,7 @@ class TraveloApplicationTests {
                             Element itemElement = (Element) itemNode;
 
                             // 필요한 데이터 추출
-                            String pAreaCode = getTextContent(itemElement, "areacode");
+                            String areaCode = getTextContent(itemElement, "areacode");
                             String type = getTextContent(itemElement, "contenttypeid");
                             String title = getTextContent(itemElement, "title");
                             String tel = getTextContent(itemElement, "tel");
@@ -72,9 +72,9 @@ class TraveloApplicationTests {
 
                             // Place 객체 생성 및 설정
                             Place place = new Place();
-                            place.setPAreaCode(pAreaCode);
+                            place.setAreaCode(areaCode);
                             place.setType(type);
-                            place.setPTitle(title);
+                            place.setTitle(title);
                             place.setTel(tel);
                             place.setZipCode(zipCode);
                             place.setAddress(address);
@@ -83,8 +83,8 @@ class TraveloApplicationTests {
                             place.setLatitude(latitude);
                             place.setImageFile1(imageFile1);
                             place.setImageFile2(imageFile2);
-                            place.setPViewCount(0);
-                            place.setPLikeCount(0);
+                            place.setViewCount(0);
+                            place.setLikeCount(0);
 
                             // 데이터베이스에 저장
                             placeRepository.save(place);

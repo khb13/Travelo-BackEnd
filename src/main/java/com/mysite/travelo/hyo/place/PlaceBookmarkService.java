@@ -3,7 +3,6 @@ package com.mysite.travelo.hyo.place;
 import com.mysite.travelo.yeon.user.User;
 import com.mysite.travelo.yeon.user.UserRepository;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

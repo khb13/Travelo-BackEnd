@@ -98,10 +98,20 @@ public class PlaceService {
         Specification<Place> spec = Specification.where((content(content_list))
                                                 .and(search(keyword).and(distance(latitude, longitude, distance))));
 
-
-
         return this.placeRepository.findAll(spec, pageable);
+    }
 
+    // 거리 검색 리스트
+    public List<Place> getPage(String keyword, double latitude, double longitude, double distance, List<String> content_list) {
+
+//        // 정렬
+//        List<Sort.Order> sorts = new ArrayList<>();
+//        sorts.add(Sort.Order.asc("latitude"));
+
+        Specification<Place> spec = Specification.where((content(content_list))
+                .and(search(keyword).and(distance(latitude, longitude, distance))));
+
+        return this.placeRepository.findAll(spec);
     }
 
     // 좋아요 기능

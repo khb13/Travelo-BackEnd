@@ -24,6 +24,8 @@ public class SecurityConfig {
 		http.
 			authorizeHttpRequests(
 					(authorizeHttpRequests) -> authorizeHttpRequests
+							.requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
+							.requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**")).permitAll()
 					.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
 		.headers(
 				(headers) -> headers
