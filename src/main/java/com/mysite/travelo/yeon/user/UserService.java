@@ -1,6 +1,7 @@
 package com.mysite.travelo.yeon.user;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,17 +23,15 @@ public class UserService {
 		return userRepository.existsByUsername(username);
 	}
 	
-	public void securityJoin(JoinRequest joinRequest) {
-		if (userRepository.existsByUsername(joinRequest.getUsername())) {
+	public void securityJoin(Map<String, String> map) {
+		if (userRepository.existsByUsername(map.get("username"))) {
 			return;
 		}
 		
-		joinRequest.setPassword(bCryptPasswordEncoder.encode(joinRequest.getPassword()));
-		
 		SiteUser user = new SiteUser();
-		user.setUsername(joinRequest.getUsername());
-		user.setPassword(joinRequest.getPassword());
-		user.setTel(joinRequest.getTel());
+		user.setUsername(map.get("username"));
+		user.setPassword(bCryptPasswordEncoder.encode(map.get("password")));
+		user.setTel(map.get("tel"));
 		user.setRole(UserRole.USER);
 		user.setRegisterDate(LocalDateTime.now());
 		user.setDelYn("N");
@@ -40,14 +39,14 @@ public class UserService {
 		userRepository.save(user);
 	}
 	
-	public SiteUser login(LoginRequest loginRequest) {
-		Optional<SiteUser> findUser = userRepository.findByUsername(loginRequest.getUsername());
+	public SiteUser login(Map<String, String> map) {
+		Optional<SiteUser> findUser = userRepository.findByUsername(map.get("username"));
 		
 		if (findUser.isEmpty()) {
 			return null;
 		}
 		
-		if (!bCryptPasswordEncoder.matches(loginRequest.getPassword(), findUser.get().getPassword())) {
+		if (!bCryptPasswordEncoder.matches(map.get("password"), findUser.get().getPassword())) {
 			return null;
 		}
 		
@@ -66,11 +65,9 @@ public class UserService {
 	}
 	
 	// 수정
-	public void modify(JoinRequest joinRequest, SiteUser loginUser) {
-		joinRequest.setPassword(bCryptPasswordEncoder.encode(joinRequest.getPassword()));
-		
-		loginUser.setPassword(joinRequest.getPassword());
-		loginUser.setTel(joinRequest.getTel());
+	public void modify(Map<String, String> map, SiteUser loginUser) {
+		loginUser.setPassword(bCryptPasswordEncoder.encode(map.get("password")));
+		loginUser.setTel(map.get("tel"));
 		loginUser.setModifyDate(LocalDateTime.now());
 		
 		userRepository.save(loginUser);
@@ -82,13 +79,10 @@ public class UserService {
 		userRepository.save(loginUser);
 	}
 	
-	public void resetPassword(ResignRequest resignRequest, SiteUser loginUser) {
-		resignRequest.setPassword(bCryptPasswordEncoder.encode(resignRequest.getPassword()));
-		
-		loginUser.setPassword(resignRequest.getPassword());
+	public void resetPassword(Map<String, String> map, SiteUser loginUser) {
+		loginUser.setPassword(bCryptPasswordEncoder.encode(map.get("password")));
 		
 		userRepository.save(loginUser);
 	}
-	
 	
 }

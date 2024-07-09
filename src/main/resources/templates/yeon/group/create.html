@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>group create</title>
+</head>
+<body>
+
+	<div>
+		<div>
+		    <h5>코스 그룹 등록</h5>
+		</div>
+	</div>
+    <form th:action="@{/group/create}" th:object="${joinRequest}" method="post">
+        <!-- 오류 표시할 내용 -->
+        <div role="alert" th:if="${#fields.hasAnyErrors()}">
+        	<div th:each="err : ${#fields.allErrors()}" th:text="${err}"></div>
+        </div>
+        
+        <div>
+            <label for="username">제목</label>
+            <input type="text" th:field="*{username}" th:errorclass="error-input">
+            <div class="error-class" th:errors="*{username}"></div>
+        </div>
+
+		<a href="/group/courseList">추가하기</a>
+
+        <input type="submit" value="회원가입">
+	</form>
+
+</body>
+</html>

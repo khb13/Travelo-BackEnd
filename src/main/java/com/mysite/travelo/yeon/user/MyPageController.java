@@ -1,17 +1,18 @@
 package com.mysite.travelo.yeon.user;
 
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.validation.BindingResult;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequestMapping("/user")
@@ -22,60 +23,60 @@ public class MyPageController {
 	private final UserService userService;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	
+	private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{8,20}$");
+	
     @GetMapping("/mypage")
-    public ResponseEntity<?> myPage(JoinRequest joinRequest, Authentication auth) {
-    	
+    public ResponseEntity<?> myPage(Authentication auth) {
     	SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
     	
         return ResponseEntity.ok().body(loginUser);
     }
     
     @PostMapping("/modify")
-    public String modify(@Valid JoinRequest joinRequest, BindingResult bindingResult, Authentication auth) {
-    	
-    	// 유효성 검사 오류가 있는 경우
-        if (bindingResult.hasErrors()) {
-            // 오류 메시지를 클라이언트에 반환
-            return bindingResult.getAllErrors().stream()
-                                .map(error -> error.getDefaultMessage())
-                                .collect(Collectors.joining(", "));
-        }
+    public String modify(@RequestParam Map<String, String> map, Authentication auth) {
 		
+    	// Null 체크
+        if (!StringUtils.hasText(map.get("password")) || !StringUtils.hasText(map.get("passwordCheck")) || !StringUtils.hasText(map.get("tel"))) {
+            return "모든 필드를 채워주세요";
+        }
+    	
         // 비밀번호 = 비밀번호 체크 여부 확인
-        if (!joinRequest.getPassword().equals(joinRequest.getPasswordCheck())) {
+        if (!map.get("password").equals(map.get("passwordCheck"))) {
             return "비밀번호가 일치하지 않습니다";
         }
     	
         SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
         
-        if (bCryptPasswordEncoder.matches(joinRequest.getPassword(), loginUser.getPassword())) {
+        if (bCryptPasswordEncoder.matches(map.get("password"), loginUser.getPassword())) {
             return "기존 비밀번호는 사용할 수 없습니다";
         }
         
-        userService.modify(joinRequest, loginUser);
+        // 비밀번호 형식 체크
+        if (!PASSWORD_PATTERN.matcher(map.get("password")).matches()) {
+            return "비밀번호는 소문자 영문과 숫자를 포함하여 8자 이상 20자 이하여야 합니다";
+        }
+        
+        userService.modify(map, loginUser);
     	
         return "yeon/mypage";
     }
 	
     @PostMapping("/resign")
-    public String resign(@Valid ResignRequest resignRequest, BindingResult bindingResult, Authentication auth) {
+    public String resign(@RequestParam Map<String, String> map, Authentication auth) {
     	
-    	// 유효성 검사 오류가 있는 경우
-        if (bindingResult.hasErrors()) {
-            // 오류 메시지를 클라이언트에 반환
-            return bindingResult.getAllErrors().stream()
-                                .map(error -> error.getDefaultMessage())
-                                .collect(Collectors.joining(", "));
+    	// Null 체크
+        if (!StringUtils.hasText(map.get("password")) || !StringUtils.hasText(map.get("passwordCheck"))) {
+            return "모든 필드를 채워주세요";
         }
-		
+    	
         // 비밀번호 = 비밀번호 체크 여부 확인
-        if (!resignRequest.getPassword().equals(resignRequest.getPasswordCheck())) {
+        if (!map.get("password").equals(map.get("passwordCheck"))) {
             return "비밀번호가 일치하지 않습니다";
         }
     	
         SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
     	
-        if (!bCryptPasswordEncoder.matches(resignRequest.getPassword(), loginUser.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(map.get("password"), loginUser.getPassword())) {
             return "비밀번호가 틀렸습니다";
         }
         
@@ -85,17 +86,16 @@ public class MyPageController {
     }
     
     @PostMapping("/check")
-    public String checkUser(@Valid CheckRequest checkRequest, BindingResult bindingResult, Authentication auth) {
+    public String checkUser(@RequestParam Map<String, String> map, Authentication auth) {
     	
-        if (bindingResult.hasErrors()) {
-            return bindingResult.getAllErrors().stream()
-                                .map(error -> error.getDefaultMessage())
-                                .collect(Collectors.joining(", "));
+    	// Null 체크
+        if (!StringUtils.hasText(map.get("username")) || !StringUtils.hasText(map.get("tel"))) {
+            return "모든 필드를 채워주세요";
         }
     	
         SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
         
-        if (loginUser.getUsername().equals(checkRequest.getUsername()) && loginUser.getTel().equals(checkRequest.getTel())) {
+        if (loginUser.getUsername().equals(map.get("username")) && loginUser.getTel().equals(map.get("tel"))) {
         	return "user/resetPassword";
         }
         
@@ -103,30 +103,32 @@ public class MyPageController {
     }
     
     @PostMapping("/resetPassword")
-    public String resetPassword(@Valid ResignRequest resignRequest, BindingResult bindingResult, Authentication auth) {
+    public String resetPassword(@RequestParam Map<String, String> map, Authentication auth) {
         
-    	if (bindingResult.hasErrors()) {
-            return bindingResult.getAllErrors().stream()
-                                .map(error -> error.getDefaultMessage())
-                                .collect(Collectors.joining(", "));
+    	// Null 체크
+        if (!StringUtils.hasText(map.get("password")) || !StringUtils.hasText(map.get("passwordCheck"))) {
+            return "모든 필드를 채워주세요";
         }
     	
     	SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
     	
     	// 비밀번호 = 비밀번호 체크 여부 확인
-        if (!resignRequest.getPassword().equals(resignRequest.getPasswordCheck())) {
+        if (!map.get("password").equals(map.get("passwordCheck"))) {
             return "비밀번호가 일치하지 않습니다";
         }
         
-        if (bCryptPasswordEncoder.matches(resignRequest.getPassword(), loginUser.getPassword())) {
+        if (bCryptPasswordEncoder.matches(map.get("password"), loginUser.getPassword())) {
             return "기존 비밀번호는 사용할 수 없습니다";
         }
+        
+        // 비밀번호 형식 체크
+        if (!PASSWORD_PATTERN.matcher(map.get("password")).matches()) {
+            return "비밀번호는 소문자 영문과 숫자를 포함하여 8자 이상 20자 이하여야 합니다";
+        }
     	
-    	userService.resetPassword(resignRequest, loginUser);
+    	userService.resetPassword(map, loginUser);
     	
         return "redirect:/user/login";
     }
-    
-    
     
 }

@@ -43,4 +43,5 @@ public class SiteUser {
 	private String delYn;
 	
 	private UserRole role;
+	
 }

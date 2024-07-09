@@ -1,20 +1,22 @@
 package com.mysite.travelo.yeon.user;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.Valid;
+import java.util.regex.Pattern;
+
 import lombok.RequiredArgsConstructor;
 
 @RequestMapping("/user")
@@ -26,39 +28,51 @@ public class UserController {
 	private final JWTUtil jwtUtil;
 	private final TokenBlacklistService tokenBlacklistService;
 	
+	private static final Pattern EMAIL_PATTERN = Pattern.compile("^[\\w\\.-]+@[\\w\\.-]+\\.[a-z]{2,}$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{8,20}$");
+	
 	@PostMapping("/join")
-    public String join(@Valid @ModelAttribute JoinRequest joinRequest,
-                       BindingResult bindingResult) {
-
-		// 유효성 검사 오류가 있는 경우
-        if (bindingResult.hasErrors()) {
-            // 오류 메시지를 클라이언트에 반환
-            return bindingResult.getAllErrors().stream()
-                                .map(error -> error.getDefaultMessage())
-                                .collect(Collectors.joining(", "));
+    public String join(@RequestParam Map<String, String> map) {
+		
+		// Null 체크
+        if (!StringUtils.hasText(map.get("username")) || !StringUtils.hasText(map.get("password")) || 
+            !StringUtils.hasText(map.get("passwordCheck")) || !StringUtils.hasText(map.get("tel"))) {
+            return "모든 필드를 채워주세요";
         }
 		
         // 이메일 중복 여부 확인
-        if (userService.checkUsernameDuplicate(joinRequest.getUsername())) {
+        if (userService.checkUsernameDuplicate(map.get("username"))) {
             return "이미 가입된 이메일입니다";
+        }
+        
+        // 이메일 형식 체크
+        if (!EMAIL_PATTERN.matcher(map.get("username")).matches()) {
+            return "이메일 형식이 올바르지 않습니다";
         }
 
         // 비밀번호 = 비밀번호 체크 여부 확인
-        if (!joinRequest.getPassword().equals(joinRequest.getPasswordCheck())) {
+        if (!map.get("password").equals(map.get("passwordCheck"))) {
             return "비밀번호가 일치하지 않습니다";
         }
+        
+        // 비밀번호 형식 체크
+        if (!PASSWORD_PATTERN.matcher(map.get("password")).matches()) {
+            return "비밀번호는 소문자 영문과 숫자를 포함하여 8자 이상 20자 이하여야 합니다";
+        }
 
-        // 에러가 존재하지 않을 시 joinRequest 통해서 회원가입 완료
-        userService.securityJoin(joinRequest);
+        userService.securityJoin(map);
 
         // 회원가입 시 홈 화면으로 이동
         return "redirect:/user/login";
     }
 	
 	@PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity<?> login(@RequestParam Map<String, String> map){
 
-        SiteUser user = userService.login(loginRequest);
+		// 수정 요망 json으로 보내서 param으로 못 받음요
+        SiteUser user = userService.login(map);
+        
+        System.out.println(user);
 
         if (user == null) {
             return ResponseEntity.ok("이메일 또는 비밀번호가 일치하지 않습니다");
