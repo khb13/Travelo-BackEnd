@@ -186,9 +186,8 @@ public class PlaceController {
 
     // 조회수
     @GetMapping("/detail/{placeSeq}")
-    public ResponseEntity<Place> viewCount(@PathVariable("placeSeq") int placeSeq, Model model) {
+    public ResponseEntity<Place> viewCount(@PathVariable("placeSeq") int placeSeq) {
         Place place = placeService.increaseViewCount(placeSeq);
-        model.addAttribute("place", place);
         return ResponseEntity.ok(place);
     }
 

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Course List</title>
+</head>
+<body>
+<h2>course/List</h2>
+
+<!-- 코스 목록 -->
+<div>
+    <ul>
+        <li th:each="course: ${paging}">
+            <ul>
+                <li th:each="courseList : ${course.courseList}">
+                
+                	<!-- 이미지 목록 -->
+                    <ul>
+                        <th:block th:each="place, iterStat : ${courseList.place}">
+                            <th:block th:if="${iterStat.index < 4}">
+                                <li>
+                                    <strong>원본 사진:</strong> <img th:src="${place.imageFile1}" alt="">
+                                </li>
+                                <li>
+                                    <strong>썸네일 사진:</strong> <img th:src="${place.imageFile2}" alt="">
+                                </li>
+                            </th:block>
+                        </th:block>
+                    </ul>
+                  </li>
+                    
+                    <!-- 코스 정보 -->
+                        <li>
+                            <strong>코스명:</strong> <a th:text="${course.title}" th:href="@{|/course/detail/${course.courseSeq}|}"></a>
+                        </li>
+                        <li>
+                            <strong>코스 상세설명:</strong> <span th:text="${course.description}"></span>
+                        </li>
+                        <li>
+                            <strong>코스 조회수:</strong> <span th:text="${course.viewCount}"></span>
+                        </li>
+                        <li>
+                            <strong>코스 좋아요 수:</strong> <span th:text="${course.likeCount}"></span>
+                        </li>
+                        <li>
+                            <strong>코스 생성일자:</strong> <span th:text="${#temporals.format(course.createDate, 'yyyy-MM-dd HH:mm')}"></span>
+                        </li>
+                        <li>
+                            <strong>코스 수정일자:</strong> <span th:text="${#temporals.format(course.modifyDate, 'yyyy-MM-dd HH:mm')}"></span>
+                        </li>
+                    
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>
