@@ -13,6 +13,9 @@ public class CustomCourseRequest {
     private String description;
 
     @NotEmpty
+    private int authorSeq;
+
+    @NotEmpty
     private Map<String, Integer> placeMap;
 
     @NotEmpty
@@ -26,6 +29,10 @@ public class CustomCourseRequest {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public int getAuthorSeq() {return authorSeq;}
+
+    public void setAuthorSeq(int authorSeq) {this.authorSeq = authorSeq;}
 
     public String getDescription() {
         return description;

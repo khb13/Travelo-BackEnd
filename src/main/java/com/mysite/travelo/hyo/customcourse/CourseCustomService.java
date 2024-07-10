@@ -5,11 +5,16 @@ import com.mysite.travelo.gil.course.Course;
 import com.mysite.travelo.gil.course.CourseList;
 import com.mysite.travelo.gil.course.CourseRepository;
 import com.mysite.travelo.gil.course.CourseService;
+import com.mysite.travelo.hyo.place.Place;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -59,8 +64,32 @@ public class CourseCustomService {
         existingCourse.setCourseSeq(course.getCourseSeq());
 
         this.courseRepository.save(existingCourse);
+    }
+
+    public void deleteCourse(Integer courseSeq) {
+        this.courseRepository.delete(this.courseRepository.findByCourseSeq(courseSeq));
+
+    }
+
+    public Map<String, Object> mappin(List<Place> placeList){
+        Map<String, Object> response = new HashMap<>();
+        if(placeList.size()>6){
+            response.put("error", "장소는 최대 6개까지 추가할 수 있습니다.");
+            return response;
+        }
 
 
+
+        Map<Integer, Map<String, Double>> placeMap = new HashMap<>();
+        for (Place place : placeList) {
+            Map<String, Double> pin = new HashMap<>();
+            pin.put("Longitude", place.getLongitude());
+            pin.put("latitude", place.getLatitude());
+            placeMap.put(place.getPlaceSeq(), pin);
+        }
+
+        response.put("placeMap", placeMap);
+        return response;
     }
 
 
