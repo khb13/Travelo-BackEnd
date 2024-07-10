@@ -1,9 +1,15 @@
 package com.mysite.travelo.hyo.customcourse;
 
+import com.mysite.travelo.hyo.place.Place;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Map;
 
+@Getter
+@Setter
 public class CustomCourseRequest {
 
     @NotEmpty
@@ -12,49 +18,22 @@ public class CustomCourseRequest {
     @NotEmpty
     private String description;
 
-    @NotEmpty
+    @NotNull
     private int authorSeq;
 
     @NotEmpty
-    private Map<String, Integer> placeMap;
+    private Map<String, Place> placeMap;
 
     @NotEmpty
     private String privateYn;
 
-    // Getters and Setters
-    public String getTitle() {
-        return title;
+    @Getter
+    @Setter
+    public static class Place {
+        private Integer placeSeq;
+        private Double longitude;
+        private Double latitude;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
 
-    public int getAuthorSeq() {return authorSeq;}
-
-    public void setAuthorSeq(int authorSeq) {this.authorSeq = authorSeq;}
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Map<String, Integer> getPlaceMap() {
-        return placeMap;
-    }
-
-    public void setPlaceMap(Map<String, Integer> placeMap) {
-        this.placeMap = placeMap;
-    }
-
-    public String getPrivateYn() {
-        return privateYn;
-    }
-
-    public void setPrivateYn(String privateYn) {
-        this.privateYn = privateYn;
-    }
 }

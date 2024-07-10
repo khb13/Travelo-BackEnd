@@ -3,7 +3,6 @@ package com.mysite.travelo.hyo.place;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -60,8 +59,6 @@ public class PlaceController {
             @RequestParam(value = "area", defaultValue = "") String area
     ) {
 
-        System.out.println("sorts" + sort);
-
         List<String> content_list = List.of();
         List<String> area_list = List.of();
 
@@ -111,7 +108,7 @@ public class PlaceController {
 
         List<String> content_list = List.of();
 
-        if (!content.isEmpty() && content != null) {
+        if (!content.isEmpty()) {
             content_list = Arrays.asList(content.split(","));
         }
 
@@ -154,7 +151,7 @@ public class PlaceController {
 
         List<String> content_list = List.of();
 
-        if (!content.isEmpty() && content != null) {
+        if (!content.isEmpty()) {
             content_list = Arrays.asList(content.split(","));
         }
 

@@ -1,10 +1,13 @@
 package com.mysite.travelo.hyo.place;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 장소 북마크는 별개로 빼냈습니다.
@@ -24,28 +27,30 @@ import java.util.List;
  *
  */
 
+@RequiredArgsConstructor
 @RequestMapping("/placebookmarks")
 @Controller
 public class PlaceBookmarkController {
 
     private final PlaceBookmarkService placeBookmarkService;
 
-    public PlaceBookmarkController(PlaceBookmarkService placeBookmarkService) {
-        this.placeBookmarkService = placeBookmarkService;
-    }
-
+    // 북마크 추가
     @PostMapping("/add")
-    public ResponseEntity<?> addBookmark(@RequestParam int userSeq, @RequestParam int placeSeq) {
-        placeBookmarkService.addBookmark(userSeq, placeSeq);
-        return ResponseEntity.ok("Bookmark added");
+    public ResponseEntity<Map<String, Object>> addBookmark(@RequestParam int userSeq, @RequestParam int placeSeq) {
+        Map<String, Object> response;
+        response = placeBookmarkService.addBookmark(userSeq, placeSeq);
+        return ResponseEntity.ok(response);
     }
 
+    // 북마크 삭제
     @DeleteMapping("/remove")
     public ResponseEntity<?> removeBookmark(@RequestParam int userSeq, @RequestParam int placeSeq) {
-        placeBookmarkService.removeBookmark(userSeq, placeSeq);
-        return ResponseEntity.ok("Bookmark removed");
+        Map<String, Object> response;
+        response = placeBookmarkService.removeBookmark(userSeq, placeSeq);
+        return ResponseEntity.ok(response);
     }
 
+    // 모든 북마크를 가져오는 기능.
     @GetMapping("/all")
     public ResponseEntity<List<PlaceBookmark>> getPlaceBookmarks(@RequestParam int userSeq) {
         List<PlaceBookmark> bookmarks = placeBookmarkService.getAllBookmarks(userSeq);

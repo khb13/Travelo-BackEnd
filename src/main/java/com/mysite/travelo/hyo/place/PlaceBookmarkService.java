@@ -3,12 +3,11 @@ package com.mysite.travelo.hyo.place;
 import com.mysite.travelo.yeon.user.User;
 import com.mysite.travelo.yeon.user.UserRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 장소 북마크 서비스
@@ -26,27 +25,23 @@ import java.util.Set;
  * : userSeq (사용자 순차 번호)
  */
 
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class PlaceBookmarkService {
 
-    @Autowired
     private final PlaceRepository placeRepository;
-    @Autowired
     private final PlaceBookmarkRepository placeBookmarkRepository;
-    @Autowired
     private final UserRepository userRepository;
 
-    public PlaceBookmarkService(PlaceBookmarkRepository placeBookmarkRepository, PlaceRepository placeRepository, UserRepository userRepository) {
-        this.placeBookmarkRepository = placeBookmarkRepository;
-        this.placeRepository = placeRepository;
-        this.userRepository = userRepository;
-    }
-
-    public void addBookmark (int userSeq, int placeSeq){
+    // 북마크 추가
+    @Transactional
+    public Map<String, Object> addBookmark (int userSeq, int placeSeq){
         User user = userRepository.findById(userSeq);
         Place place = placeRepository.findById(placeSeq);
 
+        Map<String, Object> response = new HashMap<>();
+
+        // 이미 북마크한 내용인 경우를 판단.
         if(!placeBookmarkRepository.existsByUserAndPlace(user,place)){
             PlaceBookmark placeBookmark = new PlaceBookmark();
             Set<User> userSet = new HashSet<>();
@@ -54,22 +49,35 @@ public class PlaceBookmarkService {
             placeBookmark.setUser(userSet);
             placeBookmark.setPlace(place);
             placeBookmarkRepository.save(placeBookmark);
+            response.put("message", "북마크에 성공적으로 저장했습니다.");
+        } else {
+            response.put("message", "이미 북마크에 존재하는 내용입니다.");
         }
+        return response;
     }
 
+    // 북마크 내용 삭제
     @Transactional
-    public void removeBookmark(int userSeq, int placeSeq) {
+    public Map<String, Object> removeBookmark(int userSeq, int placeSeq) {
         User user = userRepository.findById(userSeq);
         Place place = placeRepository.findById(placeSeq);
 
+        Map<String, Object> response = new HashMap<>();
+
+        // 북마크의 존재여부 확인.
         if (placeBookmarkRepository.existsByUserAndPlace(user, place)) {
             placeBookmarkRepository.deleteByUserAndPlace(user, place);
+            response.put("message", "성공적으로 삭제했습니다.");
+        } else {
+            response.put("message", "처리 과정에서 문제가 발생했습니다. 내용이 존재하지 않습니다.");
         }
+
+        return response;
     }
 
+    // 북마크 불러오기?
     public List<PlaceBookmark> getAllBookmarks(int userSeq){
         User user = userRepository.findById(userSeq);
         return placeBookmarkRepository.findByUser(user);
     }
-
 }
