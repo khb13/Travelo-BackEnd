@@ -66,7 +66,7 @@ public class MyPageController {
         
         userService.modify(map, loginUser);
     	
-        return new ResponseEntity<>("성공적으로 수정되었습니다", HttpStatus.OK);
+        return ResponseEntity.ok("성공적으로 수정되었습니다");
     }
 	
     @PostMapping("/resign")
@@ -96,7 +96,7 @@ public class MyPageController {
         
         tokenBlacklistService.addToken(accessToken);
         
-        return new ResponseEntity<>("성공적으로 탈퇴되었습니다", HttpStatus.OK);
+        return ResponseEntity.ok("성공적으로 탈퇴되었습니다");
     }
     
     @PostMapping("/check")
@@ -111,7 +111,7 @@ public class MyPageController {
         
         if (loginUser.getUsername().equals(map.get("username")) && loginUser.getTel().equals(map.get("tel"))) {
         	session.setAttribute("username", loginUser.getUsername());
-        	return new ResponseEntity<>("user/resetPassword", HttpStatus.OK);
+        	return ResponseEntity.ok("회원 정보가 일치합니다");
         }
         
         return new ResponseEntity<>("해당하는 정보가 없습니다", HttpStatus.NOT_FOUND);
@@ -149,7 +149,7 @@ public class MyPageController {
     	userService.resetPassword(map, loginUser);
     	session.invalidate();
     	
-    	return new ResponseEntity<>("비밀번호 변경되었습니다", HttpStatus.OK);
+    	return ResponseEntity.ok("비밀번호 변경되었습니다");
     }
     
 }

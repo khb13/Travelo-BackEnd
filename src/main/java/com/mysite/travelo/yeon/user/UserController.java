@@ -63,7 +63,7 @@ public class UserController {
 
         userService.securityJoin(map);
 
-        return new ResponseEntity<>("가입 되었습니다", HttpStatus.OK);
+        return ResponseEntity.ok("가입 되었습니다");
     }
 	
 	@PostMapping("/login")
@@ -72,7 +72,7 @@ public class UserController {
 		SiteUser user = userService.login(loginRequest);
 
         if (user == null) {
-            return ResponseEntity.ok("이메일 또는 비밀번호가 일치하지 않습니다");
+            return new ResponseEntity<>("이메일 또는 비밀번호가 일치하지 않습니다", HttpStatus.BAD_REQUEST);
         }
 
         String accessToken = jwtUtil.createJwt(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60L);
@@ -113,14 +113,14 @@ public class UserController {
     }
     
     @PostMapping("/logout")
-    public String logout(@RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String accessToken) {
         if (accessToken.startsWith("Bearer ")) {
         	accessToken = accessToken.substring(7);
         }
         
         tokenBlacklistService.addToken(accessToken);
         
-        return "로그아웃 되었습니다";
+        return ResponseEntity.ok("로그아웃 되었습니다");
     }
     
 }

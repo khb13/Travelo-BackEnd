@@ -1,6 +1,7 @@
 package com.mysite.travelo.yeon.group;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,19 @@ public class CourseService {
 		}
 		
 		return list;
+	}
+	
+	public boolean existCourse(List<CourseSeqRequest> courseSeqs) {
+		
+		for (CourseSeqRequest courseSeq : courseSeqs) {
+			Optional<Course> oc = courseRepository.findById(courseSeq.getCourseSeq());
+			
+			if (oc.isEmpty()) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 }

@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CourseGroupRepository extends JpaRepository<CourseGroup, Integer> {
 
-	List<CourseGroup> findByAuthorUsername(String Username);
+	List<CourseGroup> findByAuthorUsername(String username);
 	
 }
