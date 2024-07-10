@@ -39,14 +39,14 @@ public class UserService {
 		userRepository.save(user);
 	}
 	
-	public SiteUser login(Map<String, String> map) {
-		Optional<SiteUser> findUser = userRepository.findByUsername(map.get("username"));
+	public SiteUser login(LoginRequest loginRequest) {
+		Optional<SiteUser> findUser = userRepository.findByUsername(loginRequest.getUsername());
 		
 		if (findUser.isEmpty()) {
 			return null;
 		}
 		
-		if (!bCryptPasswordEncoder.matches(map.get("password"), findUser.get().getPassword())) {
+		if (!bCryptPasswordEncoder.matches(loginRequest.getPassword(), findUser.get().getPassword())) {
 			return null;
 		}
 		
@@ -58,10 +58,26 @@ public class UserService {
 	}
 	
 	public SiteUser getLoginUserByUsername(String username) {
-		if (username == null) return null;
+		if (username == null) {
+			return null;
+		}
 		
 		Optional<SiteUser> findUser = userRepository.findByUsername(username);
 		return findUser.orElse(null);
+	}
+	
+	public SiteUser getUser(String username) {
+		if (username == null) {
+			return null;
+		}
+		
+		Optional<SiteUser> findUser = userRepository.findByUsername(username);
+		
+		if (findUser.isEmpty()) {
+			return null;
+		}
+
+		return findUser.get();
 	}
 	
 	// 수정

@@ -3,6 +3,7 @@ package com.mysite.travelo.yeon.user;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -32,47 +33,43 @@ public class UserController {
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{8,20}$");
 	
 	@PostMapping("/join")
-    public String join(@RequestParam Map<String, String> map) {
+    public ResponseEntity<String> join(@RequestParam Map<String, String> map) {
 		
 		// Null 체크
         if (!StringUtils.hasText(map.get("username")) || !StringUtils.hasText(map.get("password")) || 
             !StringUtils.hasText(map.get("passwordCheck")) || !StringUtils.hasText(map.get("tel"))) {
-            return "모든 필드를 채워주세요";
+        	return new ResponseEntity<>("모든 필드를 채워주세요", HttpStatus.BAD_REQUEST);
         }
 		
-        // 이메일 중복 여부 확인
-        if (userService.checkUsernameDuplicate(map.get("username"))) {
-            return "이미 가입된 이메일입니다";
-        }
-        
         // 이메일 형식 체크
         if (!EMAIL_PATTERN.matcher(map.get("username")).matches()) {
-            return "이메일 형식이 올바르지 않습니다";
+        	return new ResponseEntity<>("이메일 형식이 올바르지 않습니다", HttpStatus.BAD_REQUEST);
         }
-
-        // 비밀번호 = 비밀번호 체크 여부 확인
-        if (!map.get("password").equals(map.get("passwordCheck"))) {
-            return "비밀번호가 일치하지 않습니다";
+        
+        // 이메일 중복 여부 확인
+        if (userService.checkUsernameDuplicate(map.get("username"))) {
+        	return new ResponseEntity<>("이미 가입된 이메일입니다", HttpStatus.BAD_REQUEST);
         }
         
         // 비밀번호 형식 체크
         if (!PASSWORD_PATTERN.matcher(map.get("password")).matches()) {
-            return "비밀번호는 소문자 영문과 숫자를 포함하여 8자 이상 20자 이하여야 합니다";
+        	return new ResponseEntity<>("비밀번호는 소문자 영문과 숫자를 포함하여 8자 이상 20자 이하여야 합니다", HttpStatus.BAD_REQUEST);
+        }
+
+        // 비밀번호 = 비밀번호 체크 여부 확인
+        if (!map.get("password").equals(map.get("passwordCheck"))) {
+        	return new ResponseEntity<>("비밀번호가 일치하지 않습니다", HttpStatus.BAD_REQUEST);
         }
 
         userService.securityJoin(map);
 
-        // 회원가입 시 홈 화면으로 이동
-        return "redirect:/user/login";
+        return new ResponseEntity<>("가입 되었습니다", HttpStatus.OK);
     }
 	
 	@PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam Map<String, String> map){
+	public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
 
-		// 수정 요망 json으로 보내서 param으로 못 받음요
-        SiteUser user = userService.login(map);
-        
-        System.out.println(user);
+		SiteUser user = userService.login(loginRequest);
 
         if (user == null) {
             return ResponseEntity.ok("이메일 또는 비밀번호가 일치하지 않습니다");
@@ -94,7 +91,7 @@ public class UserController {
         }
 
         if (jwtUtil.isExpired(refreshToken)) {
-            throw new RuntimeException("Refresh token is expired");
+            throw new RuntimeException("Refresh token이 만료되었습니다");
         }
 
         String username = jwtUtil.getUsername(refreshToken);
@@ -123,7 +120,7 @@ public class UserController {
         
         tokenBlacklistService.addToken(accessToken);
         
-        return "redirect:/";
+        return "로그아웃 되었습니다";
     }
     
 }
