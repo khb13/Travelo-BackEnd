@@ -10,6 +10,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,8 +36,7 @@ public class ReviewController {
 //	댓글 작성
 	@PostMapping("create/{courseSeq}")
 	public ResponseEntity<?> createReview(@PathVariable("courseSeq") Integer courseSeq,
-								@RequestParam(value = "content") String content,
-								@Valid ReviewForm reviewForm,
+								@Valid @RequestBody ReviewForm reviewForm,
 								BindingResult bindingResult) {
 		
 		Course course = this.courseService.getCourse(courseSeq);
@@ -79,7 +79,7 @@ public class ReviewController {
 //	댓글 수정
 //	@PreAuthorize("isAuthenticated()") // 인증된 사용자에게만 메서드가 호출될수 있게 함
 	@PostMapping("/modify/{reviewSeq}")
-	public ResponseEntity<String> modifyReview(@Valid ReviewForm reviewForm,
+	public ResponseEntity<String> modifyReview(@Valid @RequestBody ReviewForm reviewForm,
 								BindingResult bindingResult,
 								@PathVariable("reviewSeq") Integer reviewSeq) {
 		
