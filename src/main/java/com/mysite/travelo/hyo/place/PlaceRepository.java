@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 
 import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface PlaceRepository extends JpaRepository<Place, Integer>, JpaSpecificationExecutor<Place> {
     // 전체 가져오는 리스트 형식
@@ -19,6 +21,7 @@ public interface PlaceRepository extends JpaRepository<Place, Integer>, JpaSpeci
     Place findByContentId(String contentId);
 
     Place findById(int placeSeq);
+    Optional<Place> findByPlaceSeq(Integer placeSeq);
 
-    Place findByPlaceSeq(Integer placeSeq);
+//    Place findByPlaceSeq(Integer placeSeq);
 }

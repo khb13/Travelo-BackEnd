@@ -25,6 +25,7 @@ public class CourseList {
 	// member는 비식별로 명시하지는 않았지만 course에서 가져옴
 	
 	@ManyToOne
+	@JoinColumn(name = "placeSeq")
 	private Place place;
 
 }

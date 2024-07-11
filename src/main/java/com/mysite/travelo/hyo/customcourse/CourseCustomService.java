@@ -191,7 +191,7 @@ public class CourseCustomService {
 
             // 코스 수정
     @Transactional
-    public Map<String, Object> modifiedCourse(Integer courseSeq, CustomCourseRequest customCourseRequest, Map<String, Object> response) {
+    public Map<String, Object> modifiedCourse(Integer courseSeq, CustomCourseRequest request, Map<String, Object> response) {
 
         /* *
          * 다음에 하나라도 해당될 경우 코스를 찾을 수 없다고 함.
@@ -212,68 +212,60 @@ public class CourseCustomService {
         boolean isModified = false;
 
         // 제목에 변경사항이 있는지 체크
-        if(!currentCourse.getTitle().equals(customCourseRequest.getTitle())){
-            currentCourse.setTitle(customCourseRequest.getTitle());
+        if(!currentCourse.getTitle().equals(request.getTitle())){
+            currentCourse.setTitle(request.getTitle());
             isModified = true;
             response.put("modyfiedTitle", currentCourse.getTitle());
         }
 
         // 변경사항이 있는지, 디스크립션에 변경이 있는지 체크
-        if(!currentCourse.getDescription().equals(customCourseRequest.getDescription())){
-            currentCourse.setDescription(customCourseRequest.getDescription());
+        if(!currentCourse.getDescription().equals(request.getDescription())){
+            currentCourse.setDescription(request.getDescription());
             isModified = true;
             response.put("modyfiedDescription", currentCourse.getDescription());
         }
 
         // 변경사항이 있는지, 공개 비공개 여부에 변경이 있는지 체크
-        if(!currentCourse.getPrivateYN().equals(customCourseRequest.getPrivateYn())){
-            currentCourse.setPrivateYN(customCourseRequest.getPrivateYn());
+        if(!currentCourse.getPrivateYN().equals(request.getPrivateYn())){
+            currentCourse.setPrivateYN(request.getPrivateYn());
             isModified = true;
             response.put("modyfiedPrivate", currentCourse.getPrivateYN());
         }
 
         // 변경사항이 있었는지 체크
 
-        List<CourseList> courseLists = objectMapper.convertValue(customCourseRequest.getPlaceSeqs(), objectMapper.getTypeFactory().constructCollectionType(List.class, CourseList.class));
-
-        List<CourseList> existingLists = currentCourse.getCourseList();
-
+        List<CourseList> courseLists = new ArrayList<>();
+            System.out.println("PlaceSeqs : " + request.getPlaceSeqs());
             // 변경사항이 없었을 경우, 코스 리스트에는 변경이 있는지 체크
-            if(!existingLists.equals(courseLists)) {
-                for (CourseList courseList : courseLists) {
+                for (int placeSeq : request.getPlaceSeqs()) {
+                    Optional<Place> optionalPlace = placeRepository.findByPlaceSeq(placeSeq);
 
-                    currentCourse.setCourseList(courseLists);
+                    if (optionalPlace.isPresent()) {
+
+                    Place place = optionalPlace.get();
+                    CourseList courseList = new CourseList();
+                    courseList.setPlace(place);
+                    courseList.setCourse(currentCourse);
+                    courseLists.add(courseList);
+
                     isModified = true;
-                    response.put("modyfiedList", currentCourse.getCourseList());
+                    courseListRepository.saveAll(courseLists);
+
+                    } else {
+
+                        throw new IllegalArgumentException("장소가 유효하지 않습니다.");
+                    }
+
                 }
-            }
+                    currentCourse.setCourseList(courseLists);
 
-//        if (existingCourse == null || !Objects.equals(existingCourse.getCourseSeq(), courseSeq) || existingCourse.getCourseSeq() < 0) {
-//            throw new IllegalArgumentException("코스를 찾을 수 없습니다.");
-//        }
-//
-//        if(existingCourse == null || existingCourse.getCourseList().isEmpty()) {
-//            throw new IllegalArgumentException("코스는 비어있을 수 없습니다.");
-//        }
-//
-//        for(CourseList place : existingCourse.getCourseList()) {
-//            if(place == null){
-//                throw new IllegalArgumentException("각각의 내용은 비어있을 수 없습니다.");
-//            }
-//        }
+                if(isModified){
+                    currentCourse.setModifyDate(LocalDateTime.now());
+                    courseRepository.save(currentCourse);
 
-
-        // 변경사항이 있었을 경우, 수정일자 추가하고 내용 변경
-        if(isModified) {
-            currentCourse.setModifyDate(LocalDateTime.now());
-            courseRepository.save(currentCourse);
-            courseListRepository.saveAll(currentCourse.getCourseList());
-            response.put("message", "코스 수정이 완료되었습니다.");
-            response.put("변경 후: ", currentCourse);
-        } else {
-            // 변경사항이 없었을 경우 변경사항이 없다는 메시지 반환.
-            response.put("message", "변경사항이 없습니다.");
-        }
+                    response.put("message", "코스가 수정되었습니다.");
+                    response.put("modyfiedList", currentCourse);
+                }
 
         // response 메시지 반환
         return response;
