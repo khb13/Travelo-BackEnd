@@ -2,7 +2,6 @@ package com.mysite.travelo.gil.course;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.mysite.travelo.hyo.place.Place;
-import com.mysite.travelo.yeon.user.User;
 
 import jakarta.persistence.*;
 import lombok.Getter;

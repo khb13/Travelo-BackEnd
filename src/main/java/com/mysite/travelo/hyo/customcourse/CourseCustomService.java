@@ -1,6 +1,5 @@
 package com.mysite.travelo.hyo.customcourse;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mysite.travelo.gil.course.Course;
 import com.mysite.travelo.gil.course.CourseList;
 import com.mysite.travelo.gil.course.CourseRepository;
@@ -20,89 +19,8 @@ public class CourseCustomService {
 
     private final CourseListRepository courseListRepository;
     private final CourseRepository courseRepository;
-    private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
     private final PlaceRepository placeRepository;
-
-//    @Transactional
-//    public Map<String, Object> create(Map<String, Object> response) {
-//        Map<String, Object> result = new HashMap<>();
-//
-//        try{
-//            Course course = new Course();
-//
-//            //set 과정
-//            course.setTitle(convertToString(response.get("title")));
-//            course.setDescription(convertToString(response.get("description")));
-//
-//            // placeMap을 CourseList 객체 리스트로 변환
-//            List<CourseList> courseLists = objectMapper.convertValue(response.get("placeMap"), objectMapper.getTypeFactory().constructCollectionType(List.class, CourseList.class));
-//
-//            course.setCourseList(courseLists);
-//            course.setPrivateYN(convertToString(response.get("privateYN")));
-//
-//            // 생성 시간 추가
-//            course.setCreateDate(LocalDateTime.now());
-//
-//
-//            // 코스 저장, 저장 결과 확인 위한 변수 할당
-//            Course savedCourse = this.courseRepository.save(course);
-//
-//            // 코스리스트에 저장
-//            for(CourseList courseList : courseLists){
-//                courseList.setCourse(savedCourse);
-//            }
-//            courseListRepository.saveAll(courseLists);
-//
-//            // 저장 후 결과 확인
-//            if(savedCourse != null && savedCourse.getCourseSeq() != null){
-//                // 성공
-//                result.put("message", "코스 생성을 성공했습니다.");
-//            } else {
-//                // 실패
-//                result.put("error", "코스 생성에 실패했습니다.");
-//            }
-//        } catch (Exception e){
-//            // 예외
-//            result.put("error", "Exception occurred: "+e.getMessage());
-//        }
-//
-//        return result;
-//    }
-
-//    @Transactional
-//    public void create(CustomCourseRequest request) {
-//
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if(authentication == null || !authentication.isAuthenticated()) {
-//            throw new RuntimeException("User is not authenticated");
-//        }
-//
-//        Object principal = authentication.getPrincipal();
-//        int userSeq;
-//        if(principal instanceof User) {
-//            userSeq = ((User) principal).getUserSeq();
-//        } else {
-//            throw new RuntimeException("User is not authenticated");
-//        }
-//
-//        // Course 생성
-//        Course course = new Course();
-//        course.setTitle(request.getTitle());
-//        course.setDescription(request.getDescription());
-//        course.setUser(userRepository.findById(userSeq));
-//        course.setCreateDate(LocalDateTime.now());
-//        course.setPrivateYN(request.getPrivateYn());
-//        courseRepository.save(course);
-//
-//        // CourseList 생성
-//        for (CustomCourseRequest.Place place : request.getPlaceMap().values()) {
-//            CourseList courseList = new CourseList();
-//            courseList.setCourse(course);
-//            courseList.setPlace(placeRepository.findById(place.getPlaceSeq()).orElseThrow(() -> new RuntimeException("Place not found")));
-//            courseListRepository.save(courseList);
-//        }
-//    }
 
     // 생성, Create
     // 이후에 userSeq 변경 필요.
