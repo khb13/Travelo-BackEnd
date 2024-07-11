@@ -144,6 +144,8 @@ public class CourseCustomService {
         course.setViewCount(0);
         course.setLikeCount(0);
 
+        List<CourseList> courseLists = new ArrayList<>();
+
         CourseList courseList = new CourseList();
         List<Place> placeList = new ArrayList<>();
 
@@ -154,6 +156,13 @@ public class CourseCustomService {
             // 장소 유효 여부 검사
             if(place == null) {
                 throw new IllegalArgumentException("장소가 유효하지 않습니다.");
+            }
+
+            Optional<CourseList> optionalCourseList = courseListRepository.findById(placeSeq);
+            if(optionalCourseList.isPresent()) {
+                CourseList coursePlaceList = optionalCourseList.get();
+                coursePlaceList.setCourse(course);
+                courseLists.add(coursePlaceList);
             }
 
             //placeList에 place들을 저장함.
@@ -169,8 +178,8 @@ public class CourseCustomService {
         courseList.setCourse(course);
         this.courseListRepository.save(courseList);
         request.setCourse(course);
-        // 이 부분 확인 필요
-        course.setCourseList(courseListRepository.findById(courseList.getCourseListSeq()));
+
+        course.setCourseList(courseLists);
 
         // 장소 리스트를 request에도 set해줌.
         courseRepository.save(course);
