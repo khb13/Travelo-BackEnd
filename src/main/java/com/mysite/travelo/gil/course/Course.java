@@ -3,6 +3,7 @@ package com.mysite.travelo.gil.course;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.mysite.travelo.yeon.user.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -14,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Getter
 @Setter
@@ -26,8 +28,8 @@ public class Course {
 	
 	@ManyToOne
 	private User user; // userSeq(회원 순차번호) 참조
-	
-	@Column(nullable = false, columnDefinition = "CHAR(2)")
+
+	@Column(nullable = false, columnDefinition = "CHAR(2) default ''")
 	private String areaCode; // 코스의 지역 코드
 	
 	@Column(nullable = false, columnDefinition = "VARCHAR(200)")
@@ -50,7 +52,8 @@ public class Course {
 	
 	@Column(nullable = false, columnDefinition = "CHAR(1) default 'N'")
 	private String privateYN; // 코스의 비공개 여부
-	
+
+	@JsonManagedReference
 	@OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE)
     private List<CourseList> courseList; // 코스의 장소 목록
 }

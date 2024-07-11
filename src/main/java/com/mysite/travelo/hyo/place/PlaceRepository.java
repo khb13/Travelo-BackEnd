@@ -20,4 +20,5 @@ public interface PlaceRepository extends JpaRepository<Place, Integer>, JpaSpeci
 
     Place findById(int placeSeq);
 
+    Place findByPlaceSeq(Integer placeSeq);
 }

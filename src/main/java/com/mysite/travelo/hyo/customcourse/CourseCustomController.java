@@ -27,36 +27,78 @@ public class CourseCustomController {
     private final CourseCustomService courseCustomService;
 
     // 코스 커스텀 리스트 제작
+//    @PostMapping("/create")
+//    public ResponseEntity<Map<String, Object>> createCustomCourse(@Valid @RequestBody CustomCourseRequest customCourseRequest, BindingResult bindingResult){
+//
+//        //response 생성
+//        Map<String, Object> response = new HashMap<>();
+//
+//        //장소 개수 검증
+//        if(customCourseRequest.getPlaceMap().isEmpty()) {
+//            response.put("lacksPlace","장소를 하나 이상 추가해주십시오.");
+//            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+//        }
+//        if(customCourseRequest.getPlaceMap().size()>6) {
+//            response.put("overPlace", "장소는 최대 6개까지 추가할 수 있습니다.");
+//            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+//        }
+//        // Valid 검사
+//        if(bindingResult.hasErrors()) {
+//            response.put("error", Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
+//            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+//        }
+//
+//        // 생성일자는 여기서 처리하지 않음.
+//        response.put("title", customCourseRequest.getTitle());
+//        response.put("description", customCourseRequest.getDescription());
+//        response.put("placeList", customCourseRequest.getPlaceMap());
+//        response.put("privateYn", customCourseRequest.getPrivateYn());
+//
+//
+//        // 실제 생성 서비스
+//        courseCustomService.create(customCourseRequest);
+//
+//        // 결과값 반환
+//        if (response.containsKey("error")){
+//            // 에러 반환 시
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+//        } else {
+//            // 성공 시
+//            return ResponseEntity.ok(response);
+//        }
+//    }
+
+    // 테스트용 무인증.
+    // request는 클라이언트에서 던져주는 값.
     @PostMapping("/create")
-    public ResponseEntity<Map<String, Object>> createCustomCourse(@Valid @RequestBody CustomCourseRequest customCourseRequest, BindingResult bindingResult){
+    public ResponseEntity<Map<String, Object>> createCustomCourse(@Valid @RequestBody CustomCourseRequest request, BindingResult bindingResult){
 
         //response 생성
         Map<String, Object> response = new HashMap<>();
 
-        //장소 개수 검증
-        if(customCourseRequest.getPlaceMap().isEmpty()) {
+        // 장소 개수 검증
+        if(request.getPlaceSeqs().isEmpty()) {
             response.put("lacksPlace","장소를 하나 이상 추가해주십시오.");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        if(customCourseRequest.getPlaceMap().size()>6) {
+        if(request.getPlaceSeqs().size() > 6) {
             response.put("overPlace", "장소는 최대 6개까지 추가할 수 있습니다.");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
+
         // Valid 검사
-        if(bindingResult.hasErrors()) {
-            response.put("error", Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
+        response = bindingResultError(bindingResult);
 
         // 생성일자는 여기서 처리하지 않음.
-        response.put("title", customCourseRequest.getTitle());
-        response.put("description", customCourseRequest.getDescription());
-        response.put("placeList", customCourseRequest.getPlaceMap());
-        response.put("privateYn", customCourseRequest.getPrivateYn());
-
+//        response.put("title", request.getTitle());
+//        response.put("description", request.getDescription());
+//        response.put("placeList", request.getPlaceList());
+//        response.put("privateYn", request.getPrivateYn());
 
         // 실제 생성 서비스
-        response =  courseCustomService.create(response);
+        Map<String, Object> serviceResponse = courseCustomService.create(request);
+
+        response.putAll(serviceResponse);
 
         // 결과값 반환
         if (response.containsKey("error")){
@@ -86,34 +128,40 @@ public class CourseCustomController {
     @PostMapping("{courseSeq}/modify")
     public ResponseEntity<Map<String, Object>> modifyCustomCourse(@PathVariable("courseSeq") Integer courseSeq, @Valid @RequestBody CustomCourseRequest customCourseRequest, BindingResult bindingResult, Principal principal){
 
-        // 입력 받은 값 출력. (테스트 코드)
-        System.out.println("Received modified data:");
-        System.out.println("courseSeq: " + courseSeq);
-        System.out.println("Title: " + customCourseRequest.getTitle());
-        System.out.println("Description: " + customCourseRequest.getDescription());
-        System.out.println("Private: " + customCourseRequest.getPrivateYn());
-        System.out.println("Place List: " + customCourseRequest.getPlaceMap());
-
         // 코스 존재 여부 점검, 유효성 검사 진행
-        Map<String, Object> response = errorResponse(bindingResult,courseSeq, principal);
+//        Map<String, Object> response = errorResponse(bindingResult,courseSeq, principal);
 
-        if (response.containsKey("error")) {
-            return ResponseEntity.badRequest().body(response);
+        Map<String, Object> response = new HashMap<>();
+        Course course = courseService.getCourse(courseSeq);
+
+        try {
+            response = courseCustomService.modifiedCourse(courseSeq, customCourseRequest, response);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+//        if (response.containsKey("error")) {
+//            return ResponseEntity.badRequest().body(response);
+//        }
 
         // 코스 수정
-        response = courseCustomService.modifiedCourse(courseSeq, customCourseRequest, response);
-
-
-        // 결과값 반환
-        if (response.containsKey("error")){
-            // 에러 반환 시
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        } else {
-            // 성공 시
-            response.put("message", "코스 수정에 성공하였습니다.");
-            return ResponseEntity.ok(response);
-        }
+//        Map<String, Object> serviceResponse = courseCustomService.modifiedCourse(courseSeq, customCourseRequest, response);
+//
+//        response.putAll(serviceResponse);
+//
+//
+//        // 결과값 반환
+//        if (response.containsKey("error")){
+//            // 에러 반환 시
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+//        } else {
+//            // 성공 시
+//            return ResponseEntity.ok(response);
+//        }
 
     }
 
