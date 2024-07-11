@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,8 @@ import com.mysite.travelo.hyo.place.Place;
 import com.mysite.travelo.hyo.place.PlaceService;
 import com.mysite.travelo.yeon.group.Course;
 import com.mysite.travelo.yeon.group.CourseService;
+import com.mysite.travelo.yeon.user.SiteUser;
+import com.mysite.travelo.yeon.user.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,14 +27,20 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MainController {
 
+	private final UserService userService;
 	private final PlaceService placeService;
 	private final CourseService courseService;
 	
 	@GetMapping("/")
-	public ResponseEntity<?> index() {
+	public ResponseEntity<?> main(Authentication auth) {
 		
 		Map<String, Object> response = new HashMap<>(); 
-
+		
+		if (auth != null) {
+			SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+			response.put("loginUser", loginUser);
+		}
+		
 		List<Map<String, String>> areaCodes = new ArrayList<>();
 		
 		String[] areaCodeStr = {"1", "3", "4", "5", "6", "39"};
