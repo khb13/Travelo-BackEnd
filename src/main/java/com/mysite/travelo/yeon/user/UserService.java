@@ -1,4 +1,4 @@
-package com.mysite.travelo.yeon.member;
+package com.mysite.travelo.yeon.user;
 
 import org.springframework.stereotype.Service;
 

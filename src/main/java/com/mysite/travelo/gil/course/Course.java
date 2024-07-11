@@ -3,7 +3,9 @@ package com.mysite.travelo.gil.course;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.mysite.travelo.yeon.member.User;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.mysite.travelo.gil.review.Review;
+import com.mysite.travelo.yeon.user.User;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -50,8 +52,13 @@ public class Course {
 	private LocalDateTime modifyDate; // 코스의 수정일자
 	
 	@Column(nullable = false, columnDefinition = "CHAR(1) default 'N'")
-	private String privateYN; // 코스의 비공개 여부
+	private String privateYn; // 코스의 비공개 여부
 	
 	@OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE)
+	@JsonManagedReference
     private List<CourseList> courseList; // 코스의 장소 목록
+	
+	@OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE)
+	@JsonManagedReference
+	private List<Review> reviewList; // 코스의 후기 목록
 }

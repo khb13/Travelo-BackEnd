@@ -17,14 +17,15 @@ public class SecurityConfig {
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.
-			authorizeHttpRequests(
-					(authorizeHttpRequests) -> authorizeHttpRequests
-					.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
-		.headers(
-				(headers) -> headers
-				.addHeaderWriter(new XFrameOptionsHeaderWriter(
-						XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
-			);
+	        authorizeHttpRequests(
+	              (authorizeHttpRequests) -> authorizeHttpRequests
+	              .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
+		     .headers(
+		           (headers) -> headers
+		           .addHeaderWriter(new XFrameOptionsHeaderWriter(
+		                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))).csrf(csrf -> csrf.disable()
+		        );
+
 		
 		return http.build();
 	}

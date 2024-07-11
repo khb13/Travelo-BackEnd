@@ -19,7 +19,7 @@ public class CourseService {
 	private final CourseRepository courseRepository;
 	
 //	코스 목록 불러오기(공개여부: 공개 / 정렬 디폴트값: 인기순 / 옵션값: 최신순, 오래된순)
-	public Page<Course> getList(int page, String privateYN, String sortBy, String areaCode, String type) {
+	public Page<Course> getCourses(int page, String privateYn, String sortBy, String areaCode, String type) {
 		
 		Pageable pageable;
 		
@@ -37,19 +37,19 @@ public class CourseService {
 //      코스 목록
         if (areaCode != null && !areaCode.isEmpty() && type != null && !type.isEmpty()) {
         	// 지역과 장소유형 둘 다 존재하는 경우 해당 장소유형의 장소가 포함된 해당 지역의 코스를 반환
-            return courseRepository.findAllByPrivateYNAndAreaCodeAndCourseListPlaceType(privateYN, areaCode, type, pageable);
+            return courseRepository.findAllByPrivateYnAndAreaCodeAndCourseListPlaceType(privateYn, areaCode, type, pageable);
             
         } else if (areaCode != null && !areaCode.isEmpty()) {
         	// 지역만 존재하는 경우 해당 지역의 코스를 반환
-        	return courseRepository.findAllByPrivateYNAndAreaCode(privateYN, areaCode, pageable);
+        	return courseRepository.findAllByPrivateYnAndAreaCode(privateYn, areaCode, pageable);
         	
         } else if (type != null && !type.isEmpty()) {
         	// 장소유형만 존재하는 경우 해당 유형의 장소가 포함된 코스를 반환
-        	return courseRepository.findAllByPrivateYNAndCourseListPlaceType(privateYN, type, pageable);
+        	return courseRepository.findAllByPrivateYnAndCourseListPlaceType(privateYn, type, pageable);
         	
         } else {
         	// 그렇지 않은 경우 필터링 되지 않은 모든 코스를 반환
-            return courseRepository.findAllByPrivateYN(privateYN, pageable);
+            return courseRepository.findAllByPrivateYn(privateYn, pageable);
         }
         
 	}
@@ -61,9 +61,37 @@ public class CourseService {
 		if(oc.isPresent()) {
 			return oc.get();
 		} else {
-			throw new DataNotFoundException("코스가 존재하지 않습니다.");
+			throw new DataNotFoundException("코스를 찾을 수 없습니다.");
 		}
 		
+	}
+	
+//	코스 조회수 (증가)
+	public Course increaseViewCount(Integer courseSeq) {
+		
+		Course course = courseRepository.findByCourseSeq(courseSeq);
+		
+		course.setViewCount(course.getViewCount() + 1);
+		
+		return courseRepository.save(course);
+	}
+	
+//	코스 좋아요 수 증가
+	public void increaseLikeCount(Integer courseSeq) {
+	    Course course = courseRepository.findByCourseSeq(courseSeq);
+	    
+	    course.setLikeCount(course.getLikeCount() + 1);
+	    
+	    courseRepository.save(course);
+	}
+	
+//	코스 좋아요 수 감소
+	public void decreaseLikeCount(Integer courseSeq) {
+	    Course course = courseRepository.findByCourseSeq(courseSeq);
+	    
+	    course.setLikeCount(course.getLikeCount() - 1);
+	    
+	    courseRepository.save(course);
 	}
 
 }

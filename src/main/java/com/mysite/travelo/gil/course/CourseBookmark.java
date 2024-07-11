@@ -1,36 +1,29 @@
 package com.mysite.travelo.gil.course;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.mysite.travelo.hyo.place.Place;
 import com.mysite.travelo.yeon.user.User;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
-public class CourseList {
+public class CourseBookmark {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer courseListSeq;
+	private Integer courseBookmarkSeq; // 코스 북마크 순차번호
+	
+	@ManyToOne
+	private User user; // userSeq(유저 순차번호) 참조
 	
 	@ManyToOne
 	@JsonBackReference
-	private Course course;
-	
-	// user는 비식별로 명시하지는 않았지만 course에서 가져옴
-	
-	@ManyToOne
-	@JsonBackReference
-	private Place place;
-
+	private Course course; // courseSeq(코스 순차번호) 참조
 }

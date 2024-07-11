@@ -2,8 +2,9 @@ package com.mysite.travelo.gil.review;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.mysite.travelo.gil.course.Course;
-import com.mysite.travelo.yeon.member.User;
+import com.mysite.travelo.yeon.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,6 +28,7 @@ public class Review {
 	private User user; // userSeq(회원 순차번호) 참조
 	
 	@ManyToOne
+	@JsonBackReference
 	private Course course; // courseSeq(코스 순차번호) 참조
 	
 	@Column(nullable = false, columnDefinition = "VARCHAR(5000)")
@@ -34,12 +36,6 @@ public class Review {
 	
 	@Column(nullable = false, columnDefinition = "int default 0")
 	private Integer recommendCount; // 후기 추천 수
-	
-	@Column(nullable = false, columnDefinition = "int default 0")
-	private Integer reportCount; // 후기 신고 수
-	
-	@Column(nullable = false, columnDefinition = "CHAR(1) default 'N'")
-	private String blindYN; // 블라인드 처리 여부
 	
 	@Column(nullable = false)
 	private LocalDateTime createDate; // 후기 작성일자
