@@ -3,6 +3,8 @@ package com.mysite.travelo.yeon.group;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.mysite.travelo.yeon.user.SiteUser;
@@ -47,5 +49,12 @@ public class CourseService {
 		
 		return true;
 	}
+	
+	public List<Course> findPopularCourses() {
+		
+        Pageable pageable = PageRequest.of(0, 6); // 첫 번째 페이지에서 최대 6개의 결과를 가져오도록 설정
+        
+        return courseRepository.findAllByPrivateYnOrderByLikeCountDescViewCountDesc("N", pageable);
+    }
 	
 }
