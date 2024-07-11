@@ -10,7 +10,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 	Page<Review> findByCourseCourseSeq(Pageable pageable, Integer courseSeq);
 	
 //	특정 코스의 댓글 개수 조회
-    long countByCourseCourseSeq(Integer courseSeq);
+    int countByCourseCourseSeq(Integer courseSeq);
 	
 //	특정 유저의 댓글 전체보기(정렬 디폴트값: 최신순 / 옵션값: 오래된순)
 	Page<Review> findByUserUserSeq(Pageable pageable, Integer userSeq);

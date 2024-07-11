@@ -64,7 +64,7 @@ public class CourseController {
 		response.put("paging", paging);
 		
 //		코스의 리뷰 개수 조회
-        long reviewCount = reviewService.getReviewsCountByCourse(courseSeq);
+        int reviewCount = reviewService.getReviewsCountByCourse(courseSeq);
         response.put("reviewCount", reviewCount);
 		
 		return response;
@@ -111,12 +111,13 @@ public class CourseController {
 //	연경이가 만든 마이페이지에 넣을 특정 유저의 리뷰 목록 조회(정렬 디폴트값: 최신순 / 옵션값: 추천순)
 	@GetMapping("/{userSeq}/myReviews")
 	public Map<String, Object> myReviews(@PathVariable("userSeq") Integer userSeq,
-							@RequestParam(value = "page", defaultValue = "0") int page,
-							@RequestParam(value = "sortBy", defaultValue = "latest") String sortBy) {
+										@RequestParam(value = "page", defaultValue = "0") int page,
+										@RequestParam(value = "sortBy", defaultValue = "latest") String sortBy) {
 		
 		Map<String, Object> response = new HashMap<>();
 		
-		Page<Review> paging = reviewService.getMyReviews(page, userSeq, sortBy);
+		Page<Map<String, Object>> paging = reviewService.getMyReviews(page, userSeq, sortBy);
+
 		response.put("paging", paging);
 		
 		return response;

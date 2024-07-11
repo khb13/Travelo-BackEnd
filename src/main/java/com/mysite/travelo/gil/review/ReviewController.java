@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mysite.travelo.gil.course.Course;
@@ -36,8 +35,8 @@ public class ReviewController {
 //	댓글 작성
 	@PostMapping("create/{courseSeq}")
 	public ResponseEntity<?> createReview(@PathVariable("courseSeq") Integer courseSeq,
-								@Valid @RequestBody ReviewForm reviewForm,
-								BindingResult bindingResult) {
+											@Valid @RequestBody ReviewForm reviewForm,
+											BindingResult bindingResult) {
 		
 		Course course = this.courseService.getCourse(courseSeq);
 		
@@ -80,8 +79,8 @@ public class ReviewController {
 //	@PreAuthorize("isAuthenticated()") // 인증된 사용자에게만 메서드가 호출될수 있게 함
 	@PostMapping("/modify/{reviewSeq}")
 	public ResponseEntity<String> modifyReview(@Valid @RequestBody ReviewForm reviewForm,
-								BindingResult bindingResult,
-								@PathVariable("reviewSeq") Integer reviewSeq) {
+												BindingResult bindingResult,
+												@PathVariable("reviewSeq") Integer reviewSeq) {
 		
 		if (bindingResult.hasErrors()) {
 			StringBuilder errorMessage = new StringBuilder("Error: ");

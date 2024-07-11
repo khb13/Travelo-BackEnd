@@ -1,6 +1,8 @@
 package com.mysite.travelo.gil.review;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -11,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import com.mysite.travelo.DataNotFoundException;
 import com.mysite.travelo.gil.course.Course;
-import com.mysite.travelo.gil.course.CourseRepository;
 import com.mysite.travelo.yeon.user.User;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
-	private final CourseRepository courseRepository;
 	
 //	특정 코스의 댓글 목록 조회(정렬 디폴트값: 인기순 / 옵션값: 최신순, 오래된순)
 	public Page<Review> getReviews(int page, Integer courseSeq, String sortBy) {
@@ -42,22 +42,14 @@ public class ReviewService {
 		return reviewRepository.findByCourseCourseSeq(pageable, courseSeq);
 	}
 	
-//	해당 댓글이 달린 특정 코스의 정보 조회
-//	public Course getCourse(Integer reviewSeq) {
-//		
-//		Review review = getReview(reviewSeq);
-//		
-//		return review.
-//	}
-	
 //	특정 코스의 댓글 개수 조회
-    public long getReviewsCountByCourse(Integer courseSeq) {
+    public int getReviewsCountByCourse(Integer courseSeq) {
     	
         return reviewRepository.countByCourseCourseSeq(courseSeq);
     }
 	
 //	특정 유저의 댓글 목록 조회(정렬 디폴트값: 최신순 / 옵션값: 오래된순)
-	public Page<Review> getMyReviews(int page, Integer userSeq, String sortBy){
+	public Page<Map<String, Object>> getMyReviews(int page, Integer userSeq, String sortBy){
 		
 		Pageable pageable;
 		
@@ -70,7 +62,16 @@ public class ReviewService {
 			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순(디폴트)
 		}
 		
-		return reviewRepository.findByUserUserSeq(pageable, userSeq);
+		Page<Review> reviews = reviewRepository.findByUserUserSeq(pageable, userSeq);
+		
+//		해당 댓글이 참조하는 코스의 순차번호와 코스명을 같이 반환
+		return reviews.map(review -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("review", review);
+            map.put("courseSeq", review.getCourse().getCourseSeq());
+            map.put("courseTitle", review.getCourse().getTitle());
+            return map;
+        });
 	}
 	
 //	댓글 작성
