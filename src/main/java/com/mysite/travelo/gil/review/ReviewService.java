@@ -75,7 +75,7 @@ public class ReviewService {
 	}
 	
 //	댓글 작성
-	public void create(Course course, String content, User user) {
+	public void create(Course course, String content, SiteUser user) {
 		Review review = new Review();
 		review.setContent(content);
 		review.setUser(user); // 임시 회원 정보

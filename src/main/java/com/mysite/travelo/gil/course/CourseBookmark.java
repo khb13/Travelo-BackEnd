@@ -1,7 +1,6 @@
 package com.mysite.travelo.gil.course;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.mysite.travelo.yeon.user.User;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,7 +20,7 @@ public class CourseBookmark {
 	private Integer courseBookmarkSeq; // 코스 북마크 순차번호
 	
 	@ManyToOne
-	private User user; // userSeq(유저 순차번호) 참조
+	private SiteUser user; // userSeq(유저 순차번호) 참조
 	
 	@ManyToOne
 	@JsonBackReference

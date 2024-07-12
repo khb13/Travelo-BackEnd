@@ -1,5 +1,7 @@
 package com.mysite.travelo.gil.course;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +23,11 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     
 //  코스 상세보기
     Course findByCourseSeq(Integer courseSeq);
+    
+    boolean existsById(Integer courseSeq);
+	
+	List<Course> findAllByPrivateYnOrderByLikeCountDescViewCountDesc(String privateYn, Pageable pageable);
+	
+	List<Course> findByAuthor(SiteUser author);
+	List<Course> findByAuthorAndAreaCode(SiteUser author, String areaCode);
 }

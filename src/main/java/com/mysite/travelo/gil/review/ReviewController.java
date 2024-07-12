@@ -41,8 +41,8 @@ public class ReviewController {
 		Course course = this.courseService.getCourse(courseSeq);
 		
 //		임시 회원 정보
-		Optional<User> ou = userRepository.findById(1);
-		User user = null;
+		Optional<SiteUser> ou = userRepository.findById(1);
+		SiteUser user = null;
 		
 		if (ou.isPresent()) {
 			user = ou.get();

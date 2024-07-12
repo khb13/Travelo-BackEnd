@@ -1,14 +1,13 @@
 package com.mysite.travelo.gil.course;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.mysite.travelo.hyo.place.Place;
-import com.mysite.travelo.yeon.user.User;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
@@ -23,14 +22,15 @@ public class CourseList {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer courseListSeq;
 	
-	@ManyToOne
 	@JsonBackReference
+	@ManyToOne
+	@JoinColumn(name="courseSeq")
 	private Course course;
 	
-	// user는 비식별로 명시하지는 않았지만 course에서 가져옴
+	// member는 비식별로 명시하지는 않았지만 course에서 가져옴
 	
 	@ManyToOne
-	@JsonBackReference
+	@JoinColumn(name = "placeSeq")
 	private Place place;
 
 }
