@@ -13,10 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.mysite.travelo.hyo.place.Place;
-import com.mysite.travelo.hyo.place.PlaceService;
-import com.mysite.travelo.yeon.group.Course;
-import com.mysite.travelo.yeon.group.CourseService;
 import com.mysite.travelo.yeon.user.SiteUser;
 import com.mysite.travelo.yeon.user.UserService;
 
