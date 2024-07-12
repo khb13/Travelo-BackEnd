@@ -1,8 +1,5 @@
 package com.mysite.travelo.hyo.customcourse;
 
-import com.mysite.travelo.gil.course.Course;
-import com.mysite.travelo.gil.course.CourseRepository;
-import com.mysite.travelo.gil.course.CourseService;
 import com.mysite.travelo.hyo.place.Place;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

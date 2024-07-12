@@ -1,11 +1,7 @@
 package com.mysite.travelo.hyo.customcourse;
 
-import com.mysite.travelo.gil.course.Course;
-import com.mysite.travelo.gil.course.CourseList;
-import com.mysite.travelo.gil.course.CourseRepository;
 import com.mysite.travelo.hyo.place.Place;
 import com.mysite.travelo.hyo.place.PlaceRepository;
-import com.mysite.travelo.yeon.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,5 @@
 package com.mysite.travelo.hyo.place;
 
-import com.mysite.travelo.yeon.user.User;
-import com.mysite.travelo.yeon.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +34,7 @@ public class PlaceBookmarkService {
     // 북마크 추가
     @Transactional
     public Map<String, Object> addBookmark (int userSeq, int placeSeq){
-        User user = userRepository.findById(userSeq);
+        SiteUser user = userRepository.findById(userSeq);
         Place place = placeRepository.findById(placeSeq);
 
         Map<String, Object> response = new HashMap<>();
@@ -44,7 +42,7 @@ public class PlaceBookmarkService {
         // 이미 북마크한 내용인 경우를 판단.
         if(!placeBookmarkRepository.existsByUserAndPlace(user,place)){
             PlaceBookmark placeBookmark = new PlaceBookmark();
-            Set<User> userSet = new HashSet<>();
+            Set<SiteUser> userSet = new HashSet<>();
             userSet.add(user);
             placeBookmark.setUser(userSet);
             placeBookmark.setPlace(place);
@@ -59,7 +57,7 @@ public class PlaceBookmarkService {
     // 북마크 내용 삭제
     @Transactional
     public Map<String, Object> removeBookmark(int userSeq, int placeSeq) {
-        User user = userRepository.findById(userSeq);
+        SiteUser user = userRepository.findById(userSeq);
         Place place = placeRepository.findById(placeSeq);
 
         Map<String, Object> response = new HashMap<>();
@@ -77,7 +75,7 @@ public class PlaceBookmarkService {
 
     // 북마크 불러오기?
     public List<PlaceBookmark> getAllBookmarks(int userSeq){
-        User user = userRepository.findById(userSeq);
+        SiteUser user = userRepository.findById(userSeq);
         return placeBookmarkRepository.findByUser(user);
     }
 }

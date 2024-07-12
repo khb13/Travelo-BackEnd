@@ -1,6 +1,5 @@
 package com.mysite.travelo.hyo.place;
 
-import com.mysite.travelo.yeon.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +16,7 @@ public class PlaceBookmark {
     private int placeBookmarkSeq;
 
     @ManyToMany
-    Set<User> user;
+    Set<SiteUser> user;
 
     @ManyToOne
     private Place place;
