@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import java.util.Set;
 
+import com.mysite.travelo.yeon.user.SiteUser;
+
 @Getter
 @Setter
 @Entity
@@ -15,8 +17,8 @@ public class PlaceBookmark {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int placeBookmarkSeq;
 
-    @ManyToMany
-    Set<SiteUser> user;
+    @ManyToOne
+    private SiteUser user;
 
     @ManyToOne
     private Place place;

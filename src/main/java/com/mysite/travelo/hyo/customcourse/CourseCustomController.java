@@ -1,10 +1,18 @@
 package com.mysite.travelo.hyo.customcourse;
 
+import com.mysite.travelo.gil.course.Course;
+import com.mysite.travelo.gil.course.CourseRepository;
+import com.mysite.travelo.gil.course.CourseService;
 import com.mysite.travelo.hyo.place.Place;
+import com.mysite.travelo.yeon.user.SiteUser;
+import com.mysite.travelo.yeon.user.UserService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +27,7 @@ import java.util.Objects;
 @RestController
 public class CourseCustomController {
 
+	private final UserService userService;
     private final CourseService courseService;
     private final CourseRepository courseRepository;
     private final CourseCustomService courseCustomService;
@@ -26,11 +35,14 @@ public class CourseCustomController {
 
     // 테스트용 무인증.
     // request는 클라이언트에서 던져주는 값.
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
-    public ResponseEntity<Map<String, Object>> createCustomCourse(@Valid @RequestBody CustomCourseRequest request, BindingResult bindingResult){
+    public ResponseEntity<Map<String, Object>> createCustomCourse(Authentication auth, @Valid @RequestBody CustomCourseRequest request, BindingResult bindingResult){
 
         //response 생성
         Map<String, Object> response = new HashMap<>();
+        
+        SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
 
         // 장소 개수 검증
         if(request.getPlaceSeqs().isEmpty()) {
@@ -46,7 +58,7 @@ public class CourseCustomController {
         response = bindingResultError(bindingResult);
 
         // 실제 생성 서비스
-        Map<String, Object> serviceResponse = courseCustomService.create(request);
+        Map<String, Object> serviceResponse = courseCustomService.create(request, loginUser);
 
         response.putAll(serviceResponse);
 
@@ -61,22 +73,27 @@ public class CourseCustomController {
     }
 
     // 코스 상세 내역 가져오기
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/details/{courseSeq}")
-    public ResponseEntity<Map<String, Object>> CustomCourseDetail(@PathVariable("courseSeq") Integer courseSeq){
+    public ResponseEntity<Map<String, Object>> CustomCourseDetail(Authentication auth, @PathVariable("courseSeq") Integer courseSeq){
 
+    	SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+    	
         // 하나의 코스 정보를 가져오는 서비스
         Course course = courseService.getCourse(courseSeq);
 
         // 응답 response 생성
         Map<String, Object> response = new HashMap<>();
+        response.put("loginUser", loginUser);
         response.put("course", course);
 
         return ResponseEntity.ok(response);
     }
 
     // 코스 수정
-    @PostMapping("{courseSeq}/modify")
-    public ResponseEntity<Map<String, Object>> modifyCustomCourse(@PathVariable("courseSeq") Integer courseSeq, @Valid @RequestBody CustomCourseRequest customCourseRequest, BindingResult bindingResult, Principal principal){
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/modify/{courseSeq}")
+    public ResponseEntity<Map<String, Object>> modifyCustomCourse(Authentication auth, @PathVariable("courseSeq") Integer courseSeq, @Valid @RequestBody CustomCourseRequest customCourseRequest, BindingResult bindingResult, Principal principal){
 
         // 코스 존재 여부 점검, 유효성 검사 진행
 //        Map<String, Object> response = errorResponse(bindingResult,courseSeq, principal);
@@ -98,6 +115,7 @@ public class CourseCustomController {
     }
 
     // 삭제
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/delete")
     public ResponseEntity<Map<String, Object>> deleteCustomCourse(@Valid @RequestBody Map<String, Integer> courseSeq, BindingResult bindingResult, Principal principal){
 
@@ -112,10 +130,15 @@ public class CourseCustomController {
     }
 
     // Map에 꽂을 핀
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/mappin")
-    public ResponseEntity<Map<String, Object>> mappinCourse(@Valid @RequestBody List<Place> placeList, BindingResult bindingResult){
+    public ResponseEntity<Map<String, Object>> mappinCourse(Authentication auth, @Valid @RequestBody List<Place> placeList, BindingResult bindingResult){
 
         Map<String, Object> response = new HashMap<>();
+        
+        SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+        
+        response.put("loginUser", loginUser);
 
         response = bindingResultError(bindingResult);
         if(response.containsKey("error")){
@@ -144,7 +167,7 @@ public class CourseCustomController {
         }
 
         Course author = courseRepository.findByCourseSeq(courseSeq);
-        if (author == null || !author.getUser().getUsername().equals(principal.getName())) {
+        if (author == null || !author.getAuthor().getUsername().equals(principal.getName())) {
             response.put("error", "권한이 없습니다.");
         }
 

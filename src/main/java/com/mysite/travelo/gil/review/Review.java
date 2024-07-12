@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.mysite.travelo.gil.course.Course;
-import com.mysite.travelo.yeon.user.User;
+import com.mysite.travelo.yeon.user.SiteUser;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,7 +25,7 @@ public class Review {
 	private Integer reviewSeq; // 후기 순차번호
 	
 	@ManyToOne
-	private User user; // userSeq(회원 순차번호) 참조
+	private SiteUser user; // userSeq(회원 순차번호) 참조
 	
 	@ManyToOne
 	@JsonBackReference

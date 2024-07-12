@@ -1,6 +1,7 @@
 package com.mysite.travelo.gil.course;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.mysite.travelo.hyo.place.Place;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;

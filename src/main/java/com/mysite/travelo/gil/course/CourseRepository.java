@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.mysite.travelo.yeon.user.SiteUser;
+
 public interface CourseRepository extends JpaRepository<Course, Integer> {
 	
 //	코스 전체보기 - 전체 지역(공개여부: 공개 / 정렬 디폴트값: 인기순 / 옵션값: 최신순, 오래된순)

@@ -10,6 +10,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.mysite.travelo.DataNotFoundException;
+import com.mysite.travelo.yeon.group.CourseSeqRequest;
+import com.mysite.travelo.yeon.user.SiteUser;
 
 import lombok.RequiredArgsConstructor;
 

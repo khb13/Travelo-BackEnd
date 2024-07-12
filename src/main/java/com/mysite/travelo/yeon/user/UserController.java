@@ -71,7 +71,7 @@ public class UserController {
 
 		SiteUser user = userService.login(loginRequest);
 
-        if (user == null) {
+		if (user == null) {
             return new ResponseEntity<>("이메일 또는 비밀번호가 일치하지 않습니다", HttpStatus.BAD_REQUEST);
         }
 

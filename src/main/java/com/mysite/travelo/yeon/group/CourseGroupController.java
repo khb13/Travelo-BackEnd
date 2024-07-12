@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mysite.travelo.gil.course.Course;
+import com.mysite.travelo.gil.course.CourseBookmark;
+import com.mysite.travelo.gil.course.CourseBookmarkService;
+import com.mysite.travelo.gil.course.CourseService;
 import com.mysite.travelo.yeon.user.SiteUser;
 import com.mysite.travelo.yeon.user.UserService;
 
@@ -166,10 +170,14 @@ public class CourseGroupController {
 		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
 		List<CourseBookmark> bookmarks = bookmarkService.getList(loginUser.getUserSeq());
 		
+		if (bookmarks == null) {
+			return new ResponseEntity<>("북마크 한 코스가 없습니다", HttpStatus.NOT_FOUND);
+		}
+		
 		Map<String, Object> response = new HashMap<>();
         response.put("loginUser", loginUser);
         response.put("bookmarks", bookmarks);
-		
+        
 		return ResponseEntity.ok(response);
 	}
 	
@@ -180,10 +188,14 @@ public class CourseGroupController {
 		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
 		List<CourseBookmark> bookmarks = bookmarkService.getListByArea(loginUser.getUserSeq(), areaCode);
 		
+		if (bookmarks == null) {
+			return new ResponseEntity<>("지역 코드 값에 해당하는 북마크가 없습니다", HttpStatus.NOT_FOUND);
+		}
+		
 		Map<String, Object> response = new HashMap<>();
         response.put("loginUser", loginUser);
         response.put("bookmarks", bookmarks);
-		
+        
 		return ResponseEntity.ok(response);
 	}
 	
@@ -194,10 +206,14 @@ public class CourseGroupController {
 		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
 		List<Course> customCourses = courseService.getCustom(loginUser);
 		
+		if (customCourses == null) {
+			return new ResponseEntity<>("커스텀 한 코스가 없습니다", HttpStatus.NOT_FOUND);
+		}
+		
 		Map<String, Object> response = new HashMap<>();
         response.put("loginUser", loginUser);
         response.put("customCourses", customCourses);
-		
+        
 		return ResponseEntity.ok(response);
 	}
 	
@@ -208,11 +224,15 @@ public class CourseGroupController {
 		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
 		List<Course> customCourses = courseService.getCustomByArea(loginUser, areaCode);
 		
+		if (customCourses == null) {
+			return new ResponseEntity<>("지역 코드 값에 해당하는 커스텀 코스가 없습니다", HttpStatus.NOT_FOUND);
+		}
+		
 		Map<String, Object> response = new HashMap<>();
         response.put("loginUser", loginUser);
         response.put("customCourses", customCourses);
-		
-		return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(response);
 	}
 	
 }

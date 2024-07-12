@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.mysite.travelo.DataNotFoundException;
 import com.mysite.travelo.gil.course.Course;
-import com.mysite.travelo.yeon.user.User;
+import com.mysite.travelo.yeon.user.SiteUser;
 
 import lombok.RequiredArgsConstructor;
 

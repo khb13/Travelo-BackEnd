@@ -8,6 +8,8 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 
 import com.mysite.travelo.DataNotFoundException;
+import com.mysite.travelo.yeon.user.SiteUser;
+import com.mysite.travelo.yeon.user.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

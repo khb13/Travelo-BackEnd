@@ -3,12 +3,10 @@ package com.mysite.travelo.gil.course;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.mysite.travelo.gil.review.Review;
-import com.mysite.travelo.yeon.user.User;
+import com.mysite.travelo.yeon.user.SiteUser;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -31,7 +29,7 @@ public class Course {
 	private Integer courseSeq; // 코스 순차번호
 	
 	@ManyToOne
-	private User user; // userSeq(회원 순차번호) 참조
+	private SiteUser author; // userSeq(회원 순차번호) 참조
 	
 	@Column(nullable = false, columnDefinition = "CHAR(2)")
 	private String areaCode; // 코스의 지역 코드

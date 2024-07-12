@@ -3,7 +3,12 @@ package com.mysite.travelo.hyo.place;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import com.mysite.travelo.yeon.user.SiteUser;
+import com.mysite.travelo.yeon.user.UserService;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,7 +50,8 @@ import java.util.Map;
 @RestController
 public class PlaceController {
 
-    private final PlaceService placeService;
+	private final UserService userService;
+	private final PlaceService placeService;
 
     // 기본 장소 리스트를 가져오는 기능
     // url 형식 : /place/list?page=&keyword=&sorts=&content=&area=
@@ -56,9 +62,10 @@ public class PlaceController {
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "sorts", defaultValue = "") String sort,
             @RequestParam(value = "content", defaultValue = "") String content,
-            @RequestParam(value = "area", defaultValue = "") String area
+            @RequestParam(value = "area", defaultValue = "") String area,
+            Authentication auth
     ) {
-
+    	
         List<String> content_list = List.of();
         List<String> area_list = List.of();
 
@@ -72,6 +79,13 @@ public class PlaceController {
         Page<Place> paging = this.placeService.getPage(item_in_page, page, keyword, sort, content_list, area_list);
 
         Map<String, Object> response = new HashMap<>();
+        
+        SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+        
+        if (loginUser == null) {
+        	response.put("loginUser", loginUser);
+        }
+        
         response.put("item_in_page", item_in_page);
         response.put("paging", paging);
         response.put("keyword", keyword);
@@ -89,7 +103,9 @@ public class PlaceController {
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "contentId", defaultValue = "2733967") String contentId,
             @RequestParam(value = "distance", defaultValue = "20.0") double distance,
-            @RequestParam(value = "content", defaultValue = "") String content)
+            @RequestParam(value = "content", defaultValue = "") String content,
+            Authentication auth
+            )
     {
 
         Place place = placeService.getPlaceByContentId(contentId);
@@ -112,6 +128,12 @@ public class PlaceController {
             content_list = Arrays.asList(content.split(","));
         }
 
+        SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+        
+        if (loginUser == null) {
+        	response.put("loginUser", loginUser);
+        }
+        
         List<Place> unpage = this.placeService.getPage(keyword, latitude, longitude, distance, content_list);
         response.put("keyword", keyword);
         response.put("unpage", unpage);
@@ -132,7 +154,9 @@ public class PlaceController {
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "contentId", defaultValue = "2733967") String contentId,
             @RequestParam(value = "distance", defaultValue = "20.0") double distance,
-            @RequestParam(value = "content", defaultValue = "") String content)
+            @RequestParam(value = "content", defaultValue = "") String content,
+            Authentication auth
+    		)
     {
 
         Place place = placeService.getPlaceByContentId(contentId);
@@ -141,6 +165,12 @@ public class PlaceController {
         double latitude = 37.582086;
 
         Map<String, Object> response = new HashMap<>();
+        
+        SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+        if (loginUser == null) {
+        	response.put("loginUser", loginUser);
+        }
+        
         if (place != null) {
             longitude = place.getLongitude();
             latitude = place.getLatitude();
@@ -168,6 +198,7 @@ public class PlaceController {
     }
 
     // 좋아요 증가
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/{placeSeq}/like")
     public ResponseEntity<Void> increaseLike(@PathVariable("placeSeq") int contentId) {
         placeService.increaseLike(contentId);
@@ -175,6 +206,7 @@ public class PlaceController {
     }
 
     // 좋아요 감소
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/{placeSeq}/removelike")
     public ResponseEntity<Void> decreaseLike(@PathVariable("placeSeq") int contentId) {
         placeService.decreaseLike(contentId);
@@ -182,11 +214,11 @@ public class PlaceController {
     }
 
     // 조회수
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/detail/{placeSeq}")
     public ResponseEntity<Place> viewCount(@PathVariable("placeSeq") int placeSeq) {
         Place place = placeService.increaseViewCount(placeSeq);
         return ResponseEntity.ok(place);
     }
-
 
 }

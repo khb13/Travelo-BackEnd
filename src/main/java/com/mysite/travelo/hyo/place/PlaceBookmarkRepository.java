@@ -3,6 +3,8 @@ package com.mysite.travelo.hyo.place;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.mysite.travelo.yeon.user.SiteUser;
+
 import java.util.List;
 import java.util.Set;
 

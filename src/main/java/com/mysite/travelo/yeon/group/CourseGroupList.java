@@ -1,6 +1,7 @@
 package com.mysite.travelo.yeon.group;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.mysite.travelo.gil.course.Course;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

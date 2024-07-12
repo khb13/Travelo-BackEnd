@@ -2,8 +2,13 @@ package com.mysite.travelo.hyo.place;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import com.mysite.travelo.yeon.user.SiteUser;
+import com.mysite.travelo.yeon.user.UserService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,28 +37,41 @@ import java.util.Map;
 @Controller
 public class PlaceBookmarkController {
 
+	private final UserService userService;
     private final PlaceBookmarkService placeBookmarkService;
 
     // 북마크 추가
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/add")
-    public ResponseEntity<Map<String, Object>> addBookmark(@RequestParam int userSeq, @RequestParam int placeSeq) {
+    public ResponseEntity<Map<String, Object>> addBookmark(Authentication auth, @RequestParam int placeSeq) {
         Map<String, Object> response;
-        response = placeBookmarkService.addBookmark(userSeq, placeSeq);
+        
+        SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+        
+        response = placeBookmarkService.addBookmark(loginUser, placeSeq);
         return ResponseEntity.ok(response);
     }
 
     // 북마크 삭제
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/remove")
-    public ResponseEntity<?> removeBookmark(@RequestParam int userSeq, @RequestParam int placeSeq) {
+    public ResponseEntity<?> removeBookmark(Authentication auth, @RequestParam int placeSeq) {
         Map<String, Object> response;
-        response = placeBookmarkService.removeBookmark(userSeq, placeSeq);
+        
+        SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+        
+        response = placeBookmarkService.removeBookmark(loginUser, placeSeq);
         return ResponseEntity.ok(response);
     }
 
     // 모든 북마크를 가져오는 기능.
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/all")
-    public ResponseEntity<List<PlaceBookmark>> getPlaceBookmarks(@RequestParam int userSeq) {
-        List<PlaceBookmark> bookmarks = placeBookmarkService.getAllBookmarks(userSeq);
+    public ResponseEntity<List<PlaceBookmark>> getPlaceBookmarks(Authentication auth) {
+    	
+    	SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+    	
+        List<PlaceBookmark> bookmarks = placeBookmarkService.getAllBookmarks(loginUser);
         return ResponseEntity.ok(bookmarks);
     }
 }

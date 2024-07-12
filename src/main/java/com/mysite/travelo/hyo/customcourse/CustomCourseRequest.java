@@ -1,5 +1,6 @@
 package com.mysite.travelo.hyo.customcourse;
 
+import com.mysite.travelo.gil.course.Course;
 import com.mysite.travelo.hyo.place.Place;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -19,7 +20,7 @@ public class CustomCourseRequest {
 
     private String description;
 
-    private int authorSeq;
+//    private int authorSeq;
 
     private String privateYn;
 

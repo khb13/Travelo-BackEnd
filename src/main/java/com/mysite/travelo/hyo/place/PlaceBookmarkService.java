@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.mysite.travelo.yeon.user.SiteUser;
+import com.mysite.travelo.yeon.user.UserRepository;
+
 import java.util.*;
 
 /**
@@ -29,12 +32,10 @@ public class PlaceBookmarkService {
 
     private final PlaceRepository placeRepository;
     private final PlaceBookmarkRepository placeBookmarkRepository;
-    private final UserRepository userRepository;
 
     // 북마크 추가
     @Transactional
-    public Map<String, Object> addBookmark (int userSeq, int placeSeq){
-        SiteUser user = userRepository.findById(userSeq);
+    public Map<String, Object> addBookmark (SiteUser user, int placeSeq){
         Place place = placeRepository.findById(placeSeq);
 
         Map<String, Object> response = new HashMap<>();
@@ -42,9 +43,7 @@ public class PlaceBookmarkService {
         // 이미 북마크한 내용인 경우를 판단.
         if(!placeBookmarkRepository.existsByUserAndPlace(user,place)){
             PlaceBookmark placeBookmark = new PlaceBookmark();
-            Set<SiteUser> userSet = new HashSet<>();
-            userSet.add(user);
-            placeBookmark.setUser(userSet);
+            placeBookmark.setUser(user);
             placeBookmark.setPlace(place);
             placeBookmarkRepository.save(placeBookmark);
             response.put("message", "북마크에 성공적으로 저장했습니다.");
@@ -56,8 +55,7 @@ public class PlaceBookmarkService {
 
     // 북마크 내용 삭제
     @Transactional
-    public Map<String, Object> removeBookmark(int userSeq, int placeSeq) {
-        SiteUser user = userRepository.findById(userSeq);
+    public Map<String, Object> removeBookmark(SiteUser user, int placeSeq) {
         Place place = placeRepository.findById(placeSeq);
 
         Map<String, Object> response = new HashMap<>();
@@ -74,8 +72,7 @@ public class PlaceBookmarkService {
     }
 
     // 북마크 불러오기?
-    public List<PlaceBookmark> getAllBookmarks(int userSeq){
-        SiteUser user = userRepository.findById(userSeq);
+    public List<PlaceBookmark> getAllBookmarks(SiteUser user){
         return placeBookmarkRepository.findByUser(user);
     }
 }

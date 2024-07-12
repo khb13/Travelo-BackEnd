@@ -1,7 +1,13 @@
 package com.mysite.travelo.hyo.customcourse;
 
+import com.mysite.travelo.gil.course.Course;
+import com.mysite.travelo.gil.course.CourseList;
+import com.mysite.travelo.gil.course.CourseRepository;
 import com.mysite.travelo.hyo.place.Place;
 import com.mysite.travelo.hyo.place.PlaceRepository;
+import com.mysite.travelo.yeon.user.SiteUser;
+import com.mysite.travelo.yeon.user.UserRepository;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,22 +27,7 @@ public class CourseCustomService {
     // 생성, Create
     // 이후에 userSeq 변경 필요.
     @Transactional
-    public Map<String, Object> create(CustomCourseRequest request) {
-        // 예제로 사용할 회원 번호
-        int userSeq = 1; // 여기에 실제 회원 번호를 넣어야 합니다.
-
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if(authentication == null || !authentication.isAuthenticated()) {
-//            throw new RuntimeException("User is not authenticated");
-//        }
-//
-//        Object principal = authentication.getPrincipal();
-//        int userSeq;
-//        if(principal instanceof User) {
-//            userSeq = ((User) principal).getUserSeq();
-//        } else {
-//            throw new RuntimeException("User is not authenticated");
-//        }
+    public Map<String, Object> create(CustomCourseRequest request, SiteUser loginUser) {
 
         // 응답 반환용 response map.
         Map<String, Object> response = new HashMap<>();
@@ -48,10 +39,8 @@ public class CourseCustomService {
 
         course.setTitle(request.getTitle());
         course.setDescription(request.getDescription());
-        // 현재 사용자의 userSeq를 불러옴.
-        // 이후 이건 Authentication으로 변경.
-        course.setUser(userRepository.findById(userSeq));
-        course.setPrivateYN(request.getPrivateYn());
+        course.setAuthor(loginUser);
+        course.setPrivateYn(request.getPrivateYn());
 
         // 초기화용 set 데이터
         course.setCreateDate(LocalDateTime.now());
@@ -59,8 +48,6 @@ public class CourseCustomService {
         course.setLikeCount(0);
 
         List<CourseList> courseLists = new ArrayList<>();
-
-        CourseList courseList = new CourseList();
         List<Place> placeList = new ArrayList<>();
 
         // Course에 들어가는 PlaceList 생성
@@ -71,6 +58,8 @@ public class CourseCustomService {
             if(place == null) {
                 throw new IllegalArgumentException("장소가 유효하지 않습니다.");
             }
+            
+            CourseList courseList = new CourseList();
 
             Optional<CourseList> optionalCourseList = courseListRepository.findById(placeSeq);
             if(optionalCourseList.isPresent()) {
@@ -83,14 +72,15 @@ public class CourseCustomService {
             //즉, 리스트에 장소를 저장함.
             placeList.add(place);
             courseList.setPlace(place);
+            courseList.setCourse(course);
             // courseList에 해당 장소 내용들을 저장함.
             // 이 과정에서 동시에 AreaCode를 가져와서 set함.
             course.setAreaCode(place.getAreaCode());
             response.put("message", "코스 장소 목록 저장 성공.");
             response.put("placeList", placeList);
+            this.courseListRepository.save(courseList);
         }
-        courseList.setCourse(course);
-        this.courseListRepository.save(courseList);
+        
         request.setCourse(course);
 
         course.setCourseList(courseLists);
@@ -140,10 +130,10 @@ public class CourseCustomService {
         }
 
         // 변경사항이 있는지, 공개 비공개 여부에 변경이 있는지 체크
-        if(!currentCourse.getPrivateYN().equals(request.getPrivateYn())){
-            currentCourse.setPrivateYN(request.getPrivateYn());
+        if(!currentCourse.getPrivateYn().equals(request.getPrivateYn())){
+            currentCourse.setPrivateYn(request.getPrivateYn());
             isModified = true;
-            response.put("modyfiedPrivate", currentCourse.getPrivateYN());
+            response.put("modyfiedPrivate", currentCourse.getPrivateYn());
         }
 
         // 변경사항이 있었는지 체크
