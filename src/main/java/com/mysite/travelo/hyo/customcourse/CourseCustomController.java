@@ -126,7 +126,7 @@ public class CourseCustomController {
         }
 
         //결과 여부 반환.
-        response = courseCustomService.mappin((placeList));
+        response = courseCustomService.mappin(placeList);
 
         // 결과 여부에 에러가 존재할 시,
         if(response.containsKey("error")){

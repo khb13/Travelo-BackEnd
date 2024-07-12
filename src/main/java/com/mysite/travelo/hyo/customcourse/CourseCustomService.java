@@ -225,10 +225,19 @@ public class CourseCustomService {
 
         // 받아온 placeList에 place가 존재하는 만큼 반복
         for (Place place : placeList) {
-            // y, x 좌표를 각각 pin이라는 map에 저장
+
+            System.out.println("Place ID: " + place.getPlaceSeq());
+            Optional<Place> optionalPlace = placeRepository.findById(place.getPlaceSeq());
+
             Map<String, Double> pin = new HashMap<>();
-            pin.put("Longitude", place.getLongitude());
-            pin.put("latitude", place.getLatitude());
+
+            if(optionalPlace.isPresent()) {
+            // y, x 좌표를 각각 pin이라는 map에 저장
+                Place placemap = optionalPlace.get();
+                pin.put("Longitude", placemap.getLongitude());
+                pin.put("latitude", placemap.getLatitude());
+
+            }
             // placeMap에 placeSeq와 pin을 저장
             placeMap.put(place.getPlaceSeq(), pin);
         }
