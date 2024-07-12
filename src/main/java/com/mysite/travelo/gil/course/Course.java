@@ -3,6 +3,9 @@ package com.mysite.travelo.gil.course;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.mysite.travelo.gil.review.Review;
 import com.mysite.travelo.yeon.user.User;
@@ -59,6 +62,7 @@ public class Course {
     private List<CourseList> courseList; // 코스의 장소 목록
 	
 	@OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE)
-	@JsonManagedReference
+	@JsonIgnore
 	private List<Review> reviewList; // 코스의 후기 목록
+
 }
