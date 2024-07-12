@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Review Modify</title>
+</head>
+<body>
+<h2>review/modify</h2>
+
+<!-- 댓글 수정 -->
+<div>
+	<form th:action="@{|/review/modify/${reviewSeq}|}" method="post" th:object="${reviewForm}">
+		<div role="alert" th:if="${#fields.hasAnyErrors()}">
+            <div th:each="err : ${#fields.allErrors()}" th:text="${err}" />
+        </div>
+    	<textarea th:field="*{content}" name="content" id="content" rows="15"></textarea>
+    	<input type="submit" value="수정">
+	</form>
+</div>
+
+</body>
+</html>
