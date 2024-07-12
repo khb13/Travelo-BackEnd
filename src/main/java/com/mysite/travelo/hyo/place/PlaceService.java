@@ -48,6 +48,12 @@ public class PlaceService {
 
     private final PlaceRepository placeRepository;
 
+    public List<Place> findPopularPlaces() {
+        Pageable pageable = PageRequest.of(0, 6);
+
+        return placeRepository.findAllOrderByLikeCountDescViewCountDesc(pageable);
+    }
+
     // 리스트의 형태로 전체를 가져옴
     public List<Place> findAll() {
         return this.placeRepository.findAll();
