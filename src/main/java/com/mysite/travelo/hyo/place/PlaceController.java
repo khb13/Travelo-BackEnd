@@ -199,22 +199,26 @@ public class PlaceController {
     // 좋아요 증가
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{placeSeq}/like")
-    public ResponseEntity<Void> increaseLike(@PathVariable("placeSeq") int contentId) {
+    public ResponseEntity<Map<String, Object>> increaseLike(@PathVariable("placeSeq") int contentId) {
         placeService.increaseLike(contentId);
-        return ResponseEntity.ok().build();
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", "좋아요가 증가하였습니다.");
+        return ResponseEntity.ok(response);
     }
 
     // 좋아요 감소
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{placeSeq}/removelike")
-    public ResponseEntity<Void> decreaseLike(@PathVariable("placeSeq") int contentId) {
+    public ResponseEntity<Map<String, Object>> decreaseLike(@PathVariable("placeSeq") int contentId) {
         placeService.decreaseLike(contentId);
-        return ResponseEntity.ok().build();
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", "좋아요를 취소하였습니다.");
+        return ResponseEntity.ok(response);
     }
 
     // 조회수
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/detail/{placeSeq}")
+    @PostMapping("/detail/{placeSeq}")
     public ResponseEntity<Place> viewCount(@PathVariable("placeSeq") int placeSeq) {
         Place place = placeService.increaseViewCount(placeSeq);
         return ResponseEntity.ok(place);
