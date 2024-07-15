@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,10 +53,6 @@ public class UserService {
 			return null;
 		}
 		
-		if ("Y".equals(findUser.get().getDelYn())) {
-			return null;
-		}
-		
 		return findUser.get();
 	}
 	
@@ -80,6 +79,20 @@ public class UserService {
 		return findUser.get();
 	}
 	
+	public SiteUser getUser(Integer userSeq) {
+		if (userSeq == null) {
+			return null;
+		}
+		
+		Optional<SiteUser> findUser = userRepository.findById(userSeq);
+		
+		if (findUser.isEmpty()) {
+			return null;
+		}
+		
+		return findUser.get();
+	}
+	
 	// 수정
 	public void modify(Map<String, String> map, SiteUser loginUser) {
 		loginUser.setPassword(bCryptPasswordEncoder.encode(map.get("password")));
@@ -89,16 +102,32 @@ public class UserService {
 		userRepository.save(loginUser);
 	}
 	
+	// 탈퇴
 	public void resign(SiteUser loginUser) {
 		loginUser.setDelYn("Y");
 		
 		userRepository.save(loginUser);
 	}
 	
+	// 비밀번호 재설정
 	public void resetPassword(Map<String, String> map, SiteUser loginUser) {
 		loginUser.setPassword(bCryptPasswordEncoder.encode(map.get("password")));
 		
 		userRepository.save(loginUser);
+	}
+	
+	// 전체 회원 목록
+	public Page<SiteUser> getAllUsers() {
+        Pageable pageable = PageRequest.of(0, 15); 
+        
+        return userRepository.findByRole(pageable, UserRole.USER);
+    }
+	
+	// 탈퇴 여부에 따른 회원 목록
+	public Page<SiteUser> getActiveUsers(String delYn) {
+		Pageable pageable = PageRequest.of(0, 15);
+		
+		return userRepository.findByRoleAndDelYn(pageable, UserRole.USER, delYn);
 	}
 	
 }

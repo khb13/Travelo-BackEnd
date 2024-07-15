@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@RequestMapping("/group")
+@RequestMapping("/user/group")
 @RestController
 @RequiredArgsConstructor
 public class CourseGroupController {

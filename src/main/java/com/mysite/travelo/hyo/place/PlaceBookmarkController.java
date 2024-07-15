@@ -33,7 +33,7 @@ import java.util.Map;
  */
 
 @RequiredArgsConstructor
-@RequestMapping("/placebookmarks")
+@RequestMapping("/user/placebookmarks")
 @Controller
 public class PlaceBookmarkController {
 

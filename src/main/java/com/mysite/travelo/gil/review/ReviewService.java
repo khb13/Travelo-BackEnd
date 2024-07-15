@@ -2,6 +2,7 @@ package com.mysite.travelo.gil.review;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -121,6 +122,14 @@ public class ReviewService {
 		Review review = getReview(reviewSeq);
         review.setRecommendCount(review.getRecommendCount() - 1);
         reviewRepository.save(review);
+	}
+	
+//	블라인드 처리된 댓글 불러오기
+	public List<Review> getBlindReview(SiteUser loginUser) {
+		
+		List<Review> blindReviews = reviewRepository.findByBlindYnAndUserUserSeq("Y", loginUser.getUserSeq());
+		
+		return blindReviews;
 	}
 
 }

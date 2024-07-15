@@ -1,12 +1,10 @@
 package com.mysite.travelo.yeon.user;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.mysite.travelo.gil.review.ReviewService;
 
 import java.util.regex.Pattern;
 
@@ -28,6 +28,7 @@ public class UserController {
 	private final UserService userService;
 	private final JWTUtil jwtUtil;
 	private final TokenBlacklistService tokenBlacklistService;
+	private final ReviewService reviewService;
 	
 	private static final Pattern EMAIL_PATTERN = Pattern.compile("^[\\w\\.-]+@[\\w\\.-]+\\.[a-z]{2,}$", Pattern.CASE_INSENSITIVE);
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{8,20}$");
@@ -75,6 +76,14 @@ public class UserController {
             return new ResponseEntity<>("이메일 또는 비밀번호가 일치하지 않습니다", HttpStatus.BAD_REQUEST);
         }
 
+		if (reviewService.getBlindReview(user).size() >= 5) {
+			return new ResponseEntity<>("지속된 악성 후기로 관리자 측에서 탈퇴 처리한 회원입니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		if ("Y".equals(user.getDelYn())) {
+			return new ResponseEntity<>("탈퇴한 회원입니다.", HttpStatus.BAD_REQUEST);
+		}
+		
         String accessToken = jwtUtil.createJwt(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60L);
         String refreshToken = jwtUtil.generateRefreshToken(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60 * 24 * 7);
         

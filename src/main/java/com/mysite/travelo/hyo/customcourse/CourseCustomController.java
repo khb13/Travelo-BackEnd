@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @RequiredArgsConstructor
-@RequestMapping("/custom")
+@RequestMapping("/user/custom")
 @RestController
 public class CourseCustomController {
 

@@ -46,7 +46,7 @@ import java.util.Map;
  */
 
 @RequiredArgsConstructor
-@RequestMapping("/place")
+@RequestMapping("/user/place")
 @RestController
 public class PlaceController {
 
@@ -80,10 +80,9 @@ public class PlaceController {
 
         Map<String, Object> response = new HashMap<>();
         
-        SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
-        
-        if (loginUser == null) {
-        	response.put("loginUser", loginUser);
+        if (auth != null) {
+            SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+            response.put("loginUser", loginUser);
         }
         
         response.put("item_in_page", item_in_page);
