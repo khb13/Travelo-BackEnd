@@ -96,10 +96,18 @@ public class CourseCustomController {
     public ResponseEntity<Map<String, Object>> modifyCustomCourse(Authentication auth, @PathVariable("courseSeq") Integer courseSeq, @Valid @RequestBody CustomCourseRequest customCourseRequest, BindingResult bindingResult, Principal principal){
 
         // 코스 존재 여부 점검, 유효성 검사 진행
-//        Map<String, Object> response = errorResponse(bindingResult,courseSeq, principal);
+        Map<String, Object> response = errorResponse(bindingResult,courseSeq, principal);
 
-        Map<String, Object> response = new HashMap<>();
         Course course = courseService.getCourse(courseSeq);
+
+        String currentUsername = auth.getName();
+
+        String courseOwnerUsername = course.getAuthor().getUsername();
+
+        if(!currentUsername.equals(courseOwnerUsername)){
+            response.put("error", "You are not authorized to modify this course.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
 
         try {
             response = courseCustomService.modifiedCourse(courseSeq, customCourseRequest, response);
@@ -117,14 +125,24 @@ public class CourseCustomController {
     // 삭제
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/delete")
-    public ResponseEntity<Map<String, Object>> deleteCustomCourse(@Valid @RequestBody Map<String, Integer> courseSeq, BindingResult bindingResult, Principal principal){
+    public ResponseEntity<Map<String, Object>> deleteCustomCourse(Authentication auth, @Valid @RequestBody Integer courseSeq, BindingResult bindingResult, Principal principal){
 
         // 유효 여부 확인
-//        Map<String, Object> response = errorResponse(bindingResult,courseSeq.get("courseSeq"), principal);
+        Map<String, Object> response = errorResponse(bindingResult,courseSeq, principal);
+
+        Course course = courseService.getCourse(courseSeq);
+
+        String currentUsername = auth.getName();
+
+        String courseOwnerUsername = course.getAuthor().getUsername();
+
+        if(!currentUsername.equals(courseOwnerUsername)){
+            response.put("error", "You are not authorized to modify this course.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
 
         // 결과에 따른 응답 메시지 반환
-        Map<String, Object> response = new HashMap<>();
-        response = courseCustomService.deleteCourse(courseSeq.get("courseSeq"), response);
+        response = courseCustomService.deleteCourse(courseSeq, response);
 
         return ResponseEntity.ok(response);
     }

@@ -2,11 +2,7 @@ package com.mysite.travelo.yeon.user;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,7 +37,8 @@ public class SiteUser {
 	
 	@Column(nullable = false, columnDefinition = "CHAR(1) default 'N'")
 	private String delYn;
-	
+
+	@Enumerated(EnumType.STRING)
 	private UserRole role;
-	
+
 }
