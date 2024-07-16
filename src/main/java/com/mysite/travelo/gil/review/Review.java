@@ -48,4 +48,11 @@ public class Review {
 	
 	@Column(nullable = true)
 	private LocalDateTime modifyDate; // 후기 수정일자
+	
+	@Column(nullable = false)
+	private Integer reportCount;
+	
+	@Column(nullable = false, columnDefinition = "char(1)")
+	private String blindYn;
+	
 }

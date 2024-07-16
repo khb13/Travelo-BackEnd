@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.mysite.travelo.gil.course.Course;
 import com.mysite.travelo.gil.course.CourseService;
@@ -23,7 +24,7 @@ import com.mysite.travelo.yeon.user.UserService;
 import lombok.RequiredArgsConstructor;
 
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class MainController {
 
@@ -31,7 +32,7 @@ public class MainController {
 	private final PlaceService placeService;
 	private final CourseService courseService;
 	
-	@GetMapping("/")
+	@GetMapping("/user/main")
 	public ResponseEntity<?> main(Authentication auth) {
 		
 		Map<String, Object> response = new HashMap<>(); 

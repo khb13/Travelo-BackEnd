@@ -46,7 +46,7 @@ import java.util.Map;
  */
 
 @RequiredArgsConstructor
-@RequestMapping("/place")
+@RequestMapping("/user/place")
 @RestController
 public class PlaceController {
 

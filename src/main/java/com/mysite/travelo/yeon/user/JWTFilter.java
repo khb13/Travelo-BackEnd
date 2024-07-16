@@ -65,6 +65,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         SiteUser user = new SiteUser();
         user.setUsername(username);
+        
         // 매번 요청마다 DB 조회해서 password 초기화 할 필요 x => 정확한 비밀번호 넣을 필요 없음
         // 따라서 임시 비밀번호 설정!
         user.setPassword("임시 비밀번호");

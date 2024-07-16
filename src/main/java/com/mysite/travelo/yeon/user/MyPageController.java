@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.StringUtils;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/user")
 @RestController
 @RequiredArgsConstructor
 public class MyPageController {
@@ -29,14 +29,16 @@ public class MyPageController {
 	
 	private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{8,20}$");
 	
-    @GetMapping("/mypage")
+	@PreAuthorize("isAuthenticated()")
+    @GetMapping("/user/mypage")
     public ResponseEntity<?> myPage(Authentication auth) {
     	SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
     	
         return ResponseEntity.ok().body(loginUser);
     }
     
-    @PostMapping("/modify")
+	@PreAuthorize("isAuthenticated()")
+    @PostMapping("/user/modify")
     public ResponseEntity<String> modify(@RequestParam Map<String, String> map, Authentication auth) {
 		
     	// Null 체크
@@ -69,7 +71,8 @@ public class MyPageController {
         return ResponseEntity.ok("성공적으로 수정되었습니다");
     }
 	
-    @PostMapping("/resign")
+	@PreAuthorize("isAuthenticated()")
+    @PostMapping("/user/resign")
     public ResponseEntity<String> resign(@RequestParam Map<String, String> map, Authentication auth, @RequestHeader("Authorization") String accessToken) {
     	
     	// Null 체크
@@ -99,7 +102,7 @@ public class MyPageController {
         return ResponseEntity.ok("성공적으로 탈퇴되었습니다");
     }
     
-    @PostMapping("/check")
+    @PostMapping("/travelo/check")
     public ResponseEntity<String> checkUser(@RequestParam Map<String, String> map, HttpSession session) {
     	
     	// Null 체크
@@ -117,7 +120,7 @@ public class MyPageController {
         return new ResponseEntity<>("해당하는 정보가 없습니다", HttpStatus.NOT_FOUND);
     }
     
-    @PostMapping("/resetPassword")
+    @PostMapping("/travelo/resetPassword")
     public ResponseEntity<String> resetPassword(@RequestParam Map<String, String> map, HttpSession session) {
         
     	// Null 체크

@@ -1,14 +1,19 @@
 package com.mysite.travelo.yeon.user;
 
-import lombok.Getter;
 
-@Getter
 public enum UserRole {
 
-	ADMIN, USER;
+	ADMIN("ADMIN"),
+	USER("USER");
+
+	private String role;
 	
-	public String getRole() {
-        return this.name();
+	UserRole(String role) {
+		this.role = role;
+	}
+	
+    public String getRole() {
+        return role;
     }
 	
 }

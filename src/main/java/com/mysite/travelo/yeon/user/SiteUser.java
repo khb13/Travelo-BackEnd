@@ -3,6 +3,7 @@ package com.mysite.travelo.yeon.user;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

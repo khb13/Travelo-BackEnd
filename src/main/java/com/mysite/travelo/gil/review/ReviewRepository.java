@@ -1,8 +1,12 @@
 package com.mysite.travelo.gil.review;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.mysite.travelo.yeon.user.SiteUser;
 
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
@@ -21,4 +25,6 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 //	신고 수 5회 이상인 공개 댓글 전체보기(정렬 디폴트값: 오래된순)
 	Page<Review> findByReportCountGreaterThanEqualAndBlindYn(Pageable pageable, Integer reportCount, String blindYn);
 	
+//	특정 유저의 블라인드 된 댓글 전체보기
+	List<Review> findByBlindYnAndUserUserSeq(String blindYn, Integer userSeq);
 }
