@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -88,7 +89,7 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 	
-	@PostMapping("/login")
+	@PostMapping("/travelo/login")
 	public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
 
 		SiteUser user = userService.login(loginRequest);
@@ -113,6 +114,7 @@ public class UserController {
         return ResponseEntity.ok().body(authResponse);
     }
 	
+	@PreAuthorize("isAuthenticated()")
     @PostMapping("/user/refreshToken")
     public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String refreshToken) {
 
@@ -135,6 +137,7 @@ public class UserController {
     }
 
     // 토큰 값 받아와서 사용자 정보 추출
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/user/info")
     public String memberInfo(Authentication auth) {
 		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
@@ -142,6 +145,7 @@ public class UserController {
         return "email : " + loginUser.getUsername() + "\nrole : " + loginUser.getRole();
     }
     
+	@PreAuthorize("isAuthenticated()")
     @PostMapping("/user/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String accessToken) {
         if (accessToken.startsWith("Bearer ")) {

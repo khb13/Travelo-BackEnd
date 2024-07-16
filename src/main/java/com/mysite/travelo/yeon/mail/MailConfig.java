@@ -13,13 +13,19 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 public class MailConfig {
 
+	@Value("${MAIL_USERNAME}")
+	private String username;
+	
+	@Value("${MAIL_PASSWORD}")
+	private String password;
+	
 	@Bean
     public JavaMailSender javaMailService() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
 
         javaMailSender.setHost("smtp.gmail.com");	
-        javaMailSender.setUsername("springb88t@gmail.com");	
-        javaMailSender.setPassword("epzssrjpwhrecvvw");		
+        javaMailSender.setUsername(username);	
+        javaMailSender.setPassword(password);		
 
         javaMailSender.setPort(587);
 

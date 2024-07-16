@@ -3,6 +3,7 @@ package com.mysite.travelo.yeon.mail;
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MailService {
 
+	@Value("${MAIL_USERNAME}")
+	private String username;
+	
 	private final JavaMailSender javaMailSender;
     private String authNum;
 
@@ -42,7 +46,7 @@ public class MailService {
         msg += "</div>";
         msg += "</body></html>";
         message.setText(msg, "utf-8", "html");
-        message.setFrom(new InternetAddress("springb88t@gmail.com", "Travelo"));
+        message.setFrom(new InternetAddress(username, "Travelo"));
 
         return message;
     }
