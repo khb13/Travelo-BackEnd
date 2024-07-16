@@ -39,17 +39,17 @@ public class ReviewService {
         	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "recommendCount").and(Sort.by(Sort.Direction.DESC, "createDate"))); // 추천 많은순, 최신순(디폴트)
         }
 		
-		return reviewRepository.findByCourseCourseSeq(pageable, courseSeq);
+		return reviewRepository.findByCourseCourseSeqAndBlindYn(pageable, courseSeq, "N");
 	}
 	
-//	특정 코스의 댓글 개수 조회
+//	특정 코스의 댓글 갯수 조회
     public int getReviewsCountByCourse(Integer courseSeq) {
     	
-        return reviewRepository.countByCourseCourseSeq(courseSeq);
+        return reviewRepository.countByCourseCourseSeqAndBlindYn(courseSeq, "N");
     }
 	
-//	특정 유저의 댓글 목록 조회(정렬 디폴트값: 최신순 / 옵션값: 오래된순)
-	public Page<Map<String, Object>> getMyReviews(int page, Integer userSeq, String sortBy){
+//	특정 유저의 공개 댓글 목록 조회(정렬 디폴트값: 최신순 / 옵션값: 오래된순)
+	public Page<Map<String, Object>> getMyReviews(int page, Integer userSeq, String sortBy) {
 		
 		Pageable pageable;
 		
@@ -62,7 +62,7 @@ public class ReviewService {
 			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순(디폴트)
 		}
 		
-		Page<Review> reviews = reviewRepository.findByUserUserSeq(pageable, userSeq);
+		Page<Review> reviews = reviewRepository.findByUserUserSeqAndBlindYn(pageable, userSeq, "N");
 		
 //		해당 댓글이 참조하는 코스의 순차번호와 코스명을 같이 반환
 		return reviews.map(review -> {
@@ -74,6 +74,29 @@ public class ReviewService {
         });
 	}
 	
+//	특정 유저의 비공개 댓글 갯수 조회
+	public int getBlindReviewsCountByUser(Integer userSeq) {
+		
+		return reviewRepository.countByUserUserSeqAndBlindYn(userSeq, "Y");
+	}
+	
+//	신고 수 5회 이상인 공개 댓글 전체보기(정렬 디폴트값: 오래된순)
+	public Page<Map<String, Object>> getReviewsWithReportCount(int page, int reportCount) {
+		
+		Pageable pageable = PageRequest.of(page, 15, Sort.Direction.ASC, "createDate"); // 오래된순(디폴트)
+		
+		Page<Review> tempBlindReviews = reviewRepository.findByReportCountGreaterThanEqualAndBlindYn(pageable, reportCount, "N");
+		
+//		해당 댓글이 참조하는 코스의 순차번호와 코스명을 같이 반환
+		return tempBlindReviews.map(review -> {
+			Map<String, Object> map = new HashMap<>();
+			map.put("review", review);
+			map.put("courseSeq", review.getCourse().getCourseSeq());
+			map.put("courseTitle", review.getCourse().getTitle());
+			return map;
+		});
+	}
+	
 //	댓글 작성
 	public void create(Course course, String content, SiteUser user) {
 		Review review = new Review();
@@ -81,6 +104,8 @@ public class ReviewService {
 		review.setUser(user); // 임시 회원 정보
 		review.setCreateDate(LocalDateTime.now());
 	    review.setRecommendCount(0); // 기본값 설정
+	    review.setReportCount(0); // 기본값 설정
+	    review.setBlindYn("N"); // 기본값 설정
 		review.setCourse(course);
 		this.reviewRepository.save(review);
 	}
@@ -121,6 +146,31 @@ public class ReviewService {
 		Review review = getReview(reviewSeq);
         review.setRecommendCount(review.getRecommendCount() - 1);
         reviewRepository.save(review);
+	}
+	
+//	댓글 신고 수 증가
+	public void increaseReportCount(Integer reviewSeq) {
+		
+		Review review = getReview(reviewSeq);
+		review.setReportCount(review.getReportCount() + 1);
+		reviewRepository.save(review);
+		
+	}
+	
+//	댓글 블라인드 처리
+	public void blindReview(Integer reviewSeq) {
+		
+		Review review = getReview(reviewSeq);
+		review.setBlindYn("Y");
+		reviewRepository.save(review);
+	}
+	
+//	댓글 신고 수 0 처리
+	public void removeBlindReview(Integer reviewSeq) {
+		
+		Review review = getReview(reviewSeq);
+		review.setReportCount(0);
+		reviewRepository.save(review);
 	}
 
 }

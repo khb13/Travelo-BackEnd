@@ -37,7 +37,7 @@ public class ReviewController {
 //	댓글 작성
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("create/{courseSeq}")
-	public ResponseEntity<?> createReview(Authentication auth,
+	public ResponseEntity<?> create(Authentication auth,
 											@PathVariable("courseSeq") Integer courseSeq,
 											@Valid @RequestBody ReviewForm reviewForm,
 											BindingResult bindingResult) {
@@ -63,7 +63,7 @@ public class ReviewController {
 //	댓글 수정
 	@PreAuthorize("isAuthenticated()") // 인증된 사용자에게만 메서드가 호출될수 있게 함
 	@PostMapping("/modify/{reviewSeq}")
-	public ResponseEntity<String> modifyReview(@Valid @RequestBody ReviewForm reviewForm,
+	public ResponseEntity<String> modify(@Valid @RequestBody ReviewForm reviewForm,
 												BindingResult bindingResult,
 												@PathVariable("reviewSeq") Integer reviewSeq) {
 		
@@ -115,6 +115,16 @@ public class ReviewController {
 		reviewService.decreaseRecommendCount(reviewSeq);
 		
 		return new ResponseEntity<>("추천이 1 감소했습니다.", HttpStatus.OK);
+	}
+	
+//	댓글 신고 증가
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/report/{reviewSeq}")
+	public ResponseEntity<String> report(@PathVariable("reviewSeq") Integer reviewSeq){
+		
+		reviewService.increaseReportCount(reviewSeq);
+		
+		return new ResponseEntity<>("신고가 1 증가했습니다.", HttpStatus.OK);
 	}
 	
 	

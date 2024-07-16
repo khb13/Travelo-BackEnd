@@ -73,11 +73,11 @@ public class CourseController {
 //		코스 조회수
 		courseService.increaseViewCount(courseSeq);
 		
-//		정렬 기준에 따라 댓글 목록 조회
+//		정렬 기준에 따라 공개 댓글 목록 조회
 		Page<Review> paging = reviewService.getReviews(page, courseSeq, sortBy);
 		response.put("paging", paging);
 		
-//		코스의 리뷰 개수 조회
+//		코스의 공개 댓글 개수 조회
         int reviewCount = reviewService.getReviewsCountByCourse(courseSeq);
         response.put("reviewCount", reviewCount);
 		
@@ -130,7 +130,7 @@ public class CourseController {
 		return new ResponseEntity<>("북마크가 삭제되었습니다.", HttpStatus.OK);
 	}
 	
-//	마이페이지에서의 유저의 리뷰 목록 조회(정렬 디폴트값: 최신순 / 옵션값: 추천순)
+//	마이페이지에서의 유저의 공개 리뷰 목록 조회(정렬 디폴트값: 최신순 / 옵션값: 추천순)
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/myReviews")
 	public Map<String, Object> myReviews(Authentication auth,
@@ -140,10 +140,18 @@ public class CourseController {
 		Map<String, Object> response = new HashMap<>();
 		
 		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
-		Page<Map<String, Object>> paging = reviewService.getMyReviews(page, loginUser.getUserSeq(), sortBy);
-
 		response.put("loginUser", loginUser);
+		
+		Page<Map<String, Object>> paging = reviewService.getMyReviews(page, loginUser.getUserSeq(), sortBy);
 		response.put("paging", paging);
+		
+		int blindReviewCount = reviewService.getBlindReviewsCountByUser(loginUser.getUserSeq());
+		
+		// 해당 유저의 블라인드 된 댓글이 1개 이상일 경우 메세지를 포함한 response 반환
+	    if (blindReviewCount >= 1) {
+	    	response.put("blindReviewCount", blindReviewCount);
+	        response.put("message", "블라인드 된 댓글이 5개 이상일 경우 사이트 이용이 제한됩니다.");
+	    }
 		
 		return response;
 	}

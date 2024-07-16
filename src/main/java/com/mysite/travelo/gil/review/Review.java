@@ -37,6 +37,12 @@ public class Review {
 	@Column(nullable = false, columnDefinition = "int default 0")
 	private Integer recommendCount; // 후기 추천 수
 	
+	@Column(nullable = false, columnDefinition = "int default 0")
+	private Integer reportCount; // 후기 신고 수
+	
+	@Column(nullable = false, columnDefinition = "CHAR(1) default 'N'")
+	private String blindYn; // 후기 비공개 여부
+	
 	@Column(nullable = false)
 	private LocalDateTime createDate; // 후기 작성일자
 	
