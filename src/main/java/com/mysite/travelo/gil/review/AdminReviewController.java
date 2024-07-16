@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController // JSON 형태로 반환할 것임을 명시
 @RequiredArgsConstructor
-@RequestMapping("/adminReview")
+@RequestMapping("/admin")
 public class AdminReviewController {
 	
 	private final ReviewService reviewService;

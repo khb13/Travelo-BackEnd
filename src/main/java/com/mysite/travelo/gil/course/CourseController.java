@@ -3,6 +3,7 @@ package com.mysite.travelo.gil.course;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,8 @@ public class CourseController {
 	
 	private final UserService userService;
 	private final CourseService courseService;
+	
+	@Autowired
 	private final ReviewService reviewService;
 	private final CourseBookmarkService courseBookmarkService;
 

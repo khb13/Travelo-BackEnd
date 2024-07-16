@@ -46,7 +46,6 @@ import java.util.Map;
  */
 
 @RequiredArgsConstructor
-@RequestMapping("/user/place")
 @RestController
 public class PlaceController {
 
@@ -55,7 +54,7 @@ public class PlaceController {
 
     // 기본 장소 리스트를 가져오는 기능
     // url 형식 : /place/list?page=&keyword=&sorts=&content=&area=
-    @GetMapping("/list")
+    @GetMapping("/place/list")
     public ResponseEntity<Map<String, Object>> list(
             @RequestParam(value = "item", defaultValue = "15") int item_in_page,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -97,7 +96,7 @@ public class PlaceController {
 
     // 거리 기반으로 장소 리스트를 가져오는 기능 - 무한 스크롤 방식
     // url 형식 : /place/distance?keyword=&contentId=&distance=&content=
-    @GetMapping("/distance")
+    @GetMapping("/place/distance")
     public ResponseEntity<Map<String, Object>> distance(
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "contentId", defaultValue = "2733967") String contentId,
@@ -146,7 +145,7 @@ public class PlaceController {
 
     // 거리 기반으로 장소 리스트를 가져오는 기능 - 페이지 값 존재
     // url 형식 : /place/distance?page=&keyword=&contentId=&distance=&content=
-    @GetMapping("/distancep")
+    @GetMapping("/place/distancep")
     public ResponseEntity<Map<String, Object>> distance(
             @RequestParam(value = "item", defaultValue = "15") int item_in_page,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -198,7 +197,7 @@ public class PlaceController {
 
  // 좋아요 증가
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/{placeSeq}/like")
+    @PostMapping("/user/place/{placeSeq}/like")
     public ResponseEntity<Map<String, Object>> increaseLike(@PathVariable("placeSeq") int contentId) {
         placeService.increaseLike(contentId);
         Map<String, Object> response = new HashMap<>();
@@ -208,7 +207,7 @@ public class PlaceController {
 
     // 좋아요 감소
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/{placeSeq}/removelike")
+    @PostMapping("/user/place/{placeSeq}/removelike")
     public ResponseEntity<Map<String, Object>> decreaseLike(@PathVariable("placeSeq") int contentId) {
         placeService.decreaseLike(contentId);
         Map<String, Object> response = new HashMap<>();
@@ -217,8 +216,7 @@ public class PlaceController {
     }
 
     // 조회수
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/detail/{placeSeq}")
+    @PostMapping("/place/detail/{placeSeq}")
     public ResponseEntity<Place> viewCount(@PathVariable("placeSeq") int placeSeq) {
         Place place = placeService.increaseViewCount(placeSeq);
         return ResponseEntity.ok(place);

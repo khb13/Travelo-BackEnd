@@ -172,6 +172,7 @@ public class ReviewService {
 		Review review = getReview(reviewSeq);
 		review.setReportCount(0);
 		reviewRepository.save(review);
+	}
 
 //	블라인드 처리된 댓글 불러오기
 	public List<Review> getBlindReview(SiteUser loginUser) {

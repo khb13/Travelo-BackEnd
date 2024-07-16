@@ -11,6 +11,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,10 +26,12 @@ public class Review {
 	private Integer reviewSeq; // 후기 순차번호
 	
 	@ManyToOne
+	@JoinColumn(name="userSeq")
 	private SiteUser user; // userSeq(회원 순차번호) 참조
 	
 	@ManyToOne
 	@JsonBackReference
+	@JoinColumn(name="courseSeq")
 	private Course course; // courseSeq(코스 순차번호) 참조
 	
 	@Column(nullable = false, columnDefinition = "VARCHAR(5000)")
@@ -48,11 +51,5 @@ public class Review {
 	
 	@Column(nullable = true)
 	private LocalDateTime modifyDate; // 후기 수정일자
-	
-	@Column(nullable = false)
-	private Integer reportCount;
-	
-	@Column(nullable = false, columnDefinition = "char(1)")
-	private String blindYn;
 	
 }
