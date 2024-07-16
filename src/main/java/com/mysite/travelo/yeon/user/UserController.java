@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 
 import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/user")
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -74,9 +73,8 @@ public class UserController {
     }
 	
 	@PostMapping("/join/mailConfirm")
-	public ResponseEntity<?> mailConfirm(HttpSession session, @RequestParam(value = "username", required = false) String username) throws Exception{
+	public ResponseEntity<?> mailConfirm(HttpSession session, @RequestParam(value = "username") String username) throws Exception{
         String code = mailService.sendSimpleMessage(username);
-        System.out.println("인증코드 : " + code);
         session.setAttribute("code", code);
         return ResponseEntity.ok(code);
     }
@@ -115,7 +113,7 @@ public class UserController {
         return ResponseEntity.ok().body(authResponse);
     }
 	
-    @PostMapping("/refreshToken")
+    @PostMapping("/user/refreshToken")
     public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String refreshToken) {
 
         if (refreshToken.startsWith("Bearer ")) {
@@ -137,14 +135,14 @@ public class UserController {
     }
 
     // 토큰 값 받아와서 사용자 정보 추출
-	@GetMapping("/info")
+	@GetMapping("/user/info")
     public String memberInfo(Authentication auth) {
 		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
 
         return "email : " + loginUser.getUsername() + "\nrole : " + loginUser.getRole();
     }
     
-    @PostMapping("/logout")
+    @PostMapping("/user/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String accessToken) {
         if (accessToken.startsWith("Bearer ")) {
         	accessToken = accessToken.substring(7);
