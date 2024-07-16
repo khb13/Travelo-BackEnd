@@ -79,12 +79,12 @@ public class PlaceController {
         Page<Place> paging = this.placeService.getPage(item_in_page, page, keyword, sort, content_list, area_list);
 
         Map<String, Object> response = new HashMap<>();
-        
+
         if (auth != null) {
             SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
             response.put("loginUser", loginUser);
         }
-        
+
         response.put("item_in_page", item_in_page);
         response.put("paging", paging);
         response.put("keyword", keyword);

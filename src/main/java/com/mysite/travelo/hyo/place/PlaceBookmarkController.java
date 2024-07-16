@@ -23,7 +23,7 @@ import java.util.Map;
  *
  * removeBookmark : 북마크에서 삭제하는 기능
  * 필요값
- * : userSeq (사용자 순차 번호)
+ * : userSeq (사용자 순차 번호)iiiiiiiiiii
  * : placeSeq (장소 순차 번호)
  *
  * getPlaceBookmarks : 해당 유저의 모든 북마크 목록을 가져오는 기능

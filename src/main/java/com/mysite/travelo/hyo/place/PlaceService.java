@@ -82,8 +82,8 @@ public class PlaceService {
 
         // 페이지
         Pageable pageable = PageRequest.of(page, item_in_page, Sort.by(sorts));
-
-     // 검색, 카테고리(장소 유형, 지역)) : 장소 유형, 지역 모두 코드 번호로 받아옴.
+        
+        // 검색, 카테고리(장소 유형, 지역)) : 장소 유형, 지역 모두 코드 번호로 받아옴.
         Specification<Place> spec = Specification.where(area(area_list))
                                         .and(content(content_list))
                                         .and(search(keyword));
