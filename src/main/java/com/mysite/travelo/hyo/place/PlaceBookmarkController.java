@@ -32,10 +32,9 @@ import java.util.Map;
  *
  */
 
-@Controller
 @RequiredArgsConstructor
 @RequestMapping("/user/placebookmarks")
-@CrossOrigin(origins="http://localhost:5173")
+@Controller
 public class PlaceBookmarkController {
 
 	private final UserService userService;

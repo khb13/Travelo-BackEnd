@@ -22,10 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@RestController
 @RequiredArgsConstructor
 @RequestMapping("/user/custom")
-@CrossOrigin(origins="http://localhost:5173")
+@RestController
 public class CourseCustomController {
 
 	private final UserService userService;

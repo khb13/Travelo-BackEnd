@@ -28,8 +28,8 @@ import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequiredArgsConstructor
 @CrossOrigin(origins="http://localhost:5173")
+@RequiredArgsConstructor
 public class UserController {
 
 	private final UserService userService;
