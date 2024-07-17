@@ -76,6 +76,7 @@ public class UserController {
 	@PostMapping("/travelo/mailConfirm")
 	public ResponseEntity<?> mailConfirm(HttpSession session, @RequestParam(value = "username") String username) throws Exception{
         String code = mailService.sendSimpleMessage(username);
+        session.setAttribute("username", username);
         session.setAttribute("code", code);
         return ResponseEntity.ok(code);
     }
@@ -83,8 +84,9 @@ public class UserController {
 	@PostMapping("/travelo/verifyCode")
 	public ResponseEntity<?> verifyCode(HttpSession session, @RequestBody VerifyCodeDto verifyCodeDto) throws Exception{
 		boolean result=false;
-        if(session.getAttribute("code").equals(verifyCodeDto.getVerifyCode())){
+        if(session.getAttribute("username").equals(verifyCodeDto.getUsername()) && session.getAttribute("code").equals(verifyCodeDto.getVerifyCode())){
             result = true;
+            session.invalidate();
         }
         return ResponseEntity.ok(result);
     }
