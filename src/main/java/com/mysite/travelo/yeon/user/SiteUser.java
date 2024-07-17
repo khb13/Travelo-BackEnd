@@ -27,7 +27,7 @@ public class SiteUser {
 	
 	private String password;
 	
-	@Column(nullable = false, columnDefinition = "CHAR(11)")
+	@Column(columnDefinition = "CHAR(11)")
 	private String tel;
 	
 	@Column(nullable = false)

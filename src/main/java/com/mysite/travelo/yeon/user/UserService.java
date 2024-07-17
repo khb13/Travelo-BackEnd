@@ -42,14 +42,14 @@ public class UserService {
 		userRepository.save(user);
 	}
 	
-	public void joinKakao(Map<String, String> map) {
-		if (userRepository.existsByUsername(map.get("username"))) {
+	public void joinKakao(String username) {
+		if (userRepository.existsByUsername(username)) {
 			return;
 		}
 		
 		SiteUser user = new SiteUser();
-		user.setUsername(map.get("username"));
-		user.setTel(map.get("tel"));
+		user.setUsername(username);
+//		user.setTel(map.get("tel"));
 		user.setRole(UserRole.USER);
 		user.setRegisterDate(LocalDateTime.now());
 		user.setDelYn("N");

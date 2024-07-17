@@ -1,6 +1,5 @@
 package com.mysite.travelo.yeon.oauth;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -13,8 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
@@ -27,8 +25,7 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/travelo")
-@CrossOrigin(origins="http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"})
 public class KakaoController {
 
 	private final UserService userService;
@@ -37,7 +34,7 @@ public class KakaoController {
 	@Value("${KAKAO_KEY}")
 	private String kakao;
 	
-	@PostMapping("/kakaoCallback")
+	@GetMapping("/travelo/kakaoCallback")
 	public ResponseEntity<?> kakaoCallback(@RequestParam String code) {
 
 		// RestTemplate 생성
@@ -72,16 +69,13 @@ public class KakaoController {
 
 	    // 사용자 정보에서 이메일 추출
 	    String username = extractEmail(response2.getBody());
-	    String tel = extractPhoneNumber(response2.getBody());
+//	    String tel = extractPhoneNumber(response2.getBody());
 
 	    SiteUser oldUser = userService.getUser(username);
 	    
 	    if (oldUser == null) {
-	        Map<String, String> map = new HashMap<>();
-	        map.put("username", username);
-	        map.put("tel", tel);
-	        
-	        userService.joinKakao(map);
+	        userService.joinKakao(username);
+	        oldUser = userService.getUser(username);
 	    }
 
 	    accessToken = jwtUtil.createJwt(oldUser.getUsername(), oldUser.getRole().toString(), 1000 * 60 * 60L);
@@ -118,11 +112,10 @@ public class KakaoController {
         return json.substring(startIndex, endIndex);
     }
     
-    // JSON에서 전화번호 추출하는 메서드
-    private String extractPhoneNumber(String json) {
-        int startIndex = json.indexOf("\"phone_number\":\"") + "\"phone_number\":\"".length();
-        int endIndex = json.indexOf("\"", startIndex);
-        return json.substring(startIndex, endIndex);
+    // 로그아웃
+    @GetMapping("/user/kakaoLogout")
+    public ResponseEntity<String> kakaoLogout() {
+    	
+    	return ResponseEntity.ok("카카오 로그아웃 성공");
     }
-    
 }
