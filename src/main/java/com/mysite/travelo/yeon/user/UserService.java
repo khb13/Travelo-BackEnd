@@ -75,6 +75,10 @@ public class UserService {
 		if (findUser.isEmpty()) {
 			return null;
 		}
+		
+		if (findUser.get().getDelYn().equals("Y")) {
+			return null;
+		}
 
 		return findUser.get();
 	}

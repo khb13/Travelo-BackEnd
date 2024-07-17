@@ -113,7 +113,8 @@ public class MyPageController {
     	
         SiteUser loginUser = userService.getUser(username);
         
-        if (loginUser.getUsername().equals(username)) {
+        if (loginUser != null) {
+
         	session.setAttribute("username", loginUser.getUsername());
         	return ResponseEntity.ok("유효한 이메일입니다");
         }
