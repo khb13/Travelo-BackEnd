@@ -51,7 +51,7 @@ public class KakaoController {
 	    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 	    params.add("grant_type", "authorization_code");
 	    params.add("client_id", kakao); // Kakao에서 발급한 REST API Key 입력
-	    params.add("redirect_uri", "http://localhost:8080/kakaoCallback"); // Kakao 개발자 센터에서 설정한 리다이렉트 URI
+	    params.add("redirect_uri", "http://localhost:8080/travelo/kakaoCallback"); // Kakao 개발자 센터에서 설정한 리다이렉트 URI
 	    params.add("code", code);
 
 	    // 헤더 + 바디 결합
