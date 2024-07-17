@@ -33,7 +33,7 @@ public class MainController {
 	private final PlaceService placeService;
 	private final CourseService courseService;
 	
-	@GetMapping("/user/main")
+	@GetMapping("/travelo/main")
 	public ResponseEntity<?> main(Authentication auth) {
 		
 		Map<String, Object> response = new HashMap<>(); 
