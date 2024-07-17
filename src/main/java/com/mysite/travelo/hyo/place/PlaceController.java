@@ -52,6 +52,7 @@ public class PlaceController {
 
 	private final UserService userService;
 	private final PlaceService placeService;
+    private final PlaceRepository placeRepository;
 
     // 기본 장소 리스트를 가져오는 기능
     // url 형식 : /place/list?page=&keyword=&sorts=&content=&area=
@@ -221,6 +222,14 @@ public class PlaceController {
     public ResponseEntity<Place> viewCount(@PathVariable("placeSeq") int placeSeq) {
         Place place = placeService.increaseViewCount(placeSeq);
         return ResponseEntity.ok(place);
+    }
+
+    @PostMapping("travelo/place/contentIdCall")
+    public int contentIdCall(@RequestBody Map<String, Object> placeSeq) {
+        int seq = (int) placeSeq.get("placeSeq");
+        int contentId = Integer.parseInt(placeRepository.findById(seq).getContentId());
+
+        return contentId;
     }
 
 }
