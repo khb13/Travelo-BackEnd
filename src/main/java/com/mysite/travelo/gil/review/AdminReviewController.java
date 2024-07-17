@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RestController // JSON 형태로 반환할 것임을 명시
 @RequiredArgsConstructor
 @RequestMapping("/admin")
-@CrossOrigin(origins="http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"})
 public class AdminReviewController {
 	
 	private final ReviewService reviewService;

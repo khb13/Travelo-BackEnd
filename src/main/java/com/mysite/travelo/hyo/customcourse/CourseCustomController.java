@@ -25,7 +25,7 @@ import java.util.Objects;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user/custom")
-@CrossOrigin(origins="http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"})
 public class CourseCustomController {
 
 	private final UserService userService;

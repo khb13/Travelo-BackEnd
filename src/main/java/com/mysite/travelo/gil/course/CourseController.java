@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RestController // JSON 형태로 반환할 것임을 명시
 @RequiredArgsConstructor
 @RequestMapping("/user/course")
-@CrossOrigin(origins="http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"})
 public class CourseController {
 	
 	private final UserService userService;
