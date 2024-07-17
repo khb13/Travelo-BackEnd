@@ -45,8 +45,9 @@ import java.util.Map;
  *
  */
 
-@RequiredArgsConstructor
 @RestController
+@RequiredArgsConstructor
+@CrossOrigin(origins="http://localhost:5173")
 public class PlaceController {
 
 	private final UserService userService;
