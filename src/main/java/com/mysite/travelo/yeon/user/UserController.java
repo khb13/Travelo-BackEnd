@@ -68,7 +68,7 @@ public class UserController {
         	return new ResponseEntity<>("비밀번호가 일치하지 않습니다", HttpStatus.BAD_REQUEST);
         }
 
-        userService.securityJoin(map);
+        userService.joinMail(map);
 
         return ResponseEntity.ok("가입 되었습니다");
     }
