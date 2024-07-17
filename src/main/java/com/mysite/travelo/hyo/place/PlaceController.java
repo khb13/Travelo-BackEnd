@@ -55,7 +55,7 @@ public class PlaceController {
 
     // 기본 장소 리스트를 가져오는 기능
     // url 형식 : /place/list?page=&keyword=&sorts=&content=&area=
-    @GetMapping("/place/list")
+    @GetMapping("/travelo/place/list")
     public ResponseEntity<Map<String, Object>> list(
             @RequestParam(value = "item", defaultValue = "15") int item_in_page,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -97,7 +97,7 @@ public class PlaceController {
 
     // 거리 기반으로 장소 리스트를 가져오는 기능 - 무한 스크롤 방식
     // url 형식 : /place/distance?keyword=&contentId=&distance=&content=
-    @GetMapping("/place/distance")
+    @GetMapping("/travelo/place/distance")
     public ResponseEntity<Map<String, Object>> distance(
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "contentId", defaultValue = "2733967") String contentId,
@@ -146,7 +146,7 @@ public class PlaceController {
 
     // 거리 기반으로 장소 리스트를 가져오는 기능 - 페이지 값 존재
     // url 형식 : /place/distance?page=&keyword=&contentId=&distance=&content=
-    @GetMapping("/place/distancep")
+    @GetMapping("/travelo/place/distancep")
     public ResponseEntity<Map<String, Object>> distance(
             @RequestParam(value = "item", defaultValue = "15") int item_in_page,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -217,7 +217,7 @@ public class PlaceController {
     }
 
     // 조회수
-    @PostMapping("/place/detail/{placeSeq}")
+    @PostMapping("/travelo/place/detail/{placeSeq}")
     public ResponseEntity<Place> viewCount(@PathVariable("placeSeq") int placeSeq) {
         Place place = placeService.increaseViewCount(placeSeq);
         return ResponseEntity.ok(place);
