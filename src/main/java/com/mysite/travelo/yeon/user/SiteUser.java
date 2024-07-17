@@ -25,10 +25,9 @@ public class SiteUser {
 	@Column(nullable = false, unique = true)
 	private String username;
 	
-	@Column(nullable = false)
 	private String password;
 	
-	@Column(nullable = false, columnDefinition = "CHAR(11)")
+	@Column(columnDefinition = "CHAR(11)")
 	private String tel;
 	
 	@Column(nullable = false)
@@ -41,5 +40,7 @@ public class SiteUser {
 
 	@Enumerated(EnumType.STRING)
 	private UserRole role;
-
+	
+	private String Oauth;
+	
 }

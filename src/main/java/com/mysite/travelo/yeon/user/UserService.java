@@ -26,7 +26,7 @@ public class UserService {
 		return userRepository.existsByUsername(username);
 	}
 	
-	public void securityJoin(Map<String, String> map) {
+	public void joinMail(Map<String, String> map) {
 		if (userRepository.existsByUsername(map.get("username"))) {
 			return;
 		}
@@ -38,6 +38,22 @@ public class UserService {
 		user.setRole(UserRole.USER);
 		user.setRegisterDate(LocalDateTime.now());
 		user.setDelYn("N");
+		
+		userRepository.save(user);
+	}
+	
+	public void joinKakao(String username) {
+		if (userRepository.existsByUsername(username)) {
+			return;
+		}
+		
+		SiteUser user = new SiteUser();
+		user.setUsername(username);
+//		user.setTel(map.get("tel"));
+		user.setRole(UserRole.USER);
+		user.setRegisterDate(LocalDateTime.now());
+		user.setDelYn("N");
+		user.setOauth("kakao");
 		
 		userRepository.save(user);
 	}
