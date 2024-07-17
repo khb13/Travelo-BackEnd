@@ -1,7 +1,6 @@
 package com.mysite.travelo.yeon.user;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,7 +39,7 @@ public class UserController {
 	private static final Pattern EMAIL_PATTERN = Pattern.compile("^[\\w\\.-]+@[\\w\\.-]+\\.[a-z]{2,}$", Pattern.CASE_INSENSITIVE);
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{8,20}$");
 	
-	@PostMapping("/join")
+	@PostMapping("/travelo/join")
     public ResponseEntity<String> join(@RequestParam Map<String, String> map) {
 		
 		// Null 체크
@@ -75,14 +73,14 @@ public class UserController {
         return ResponseEntity.ok("가입 되었습니다");
     }
 	
-	@PostMapping("/join/mailConfirm")
+	@PostMapping("/travelo/mailConfirm")
 	public ResponseEntity<?> mailConfirm(HttpSession session, @RequestParam(value = "username") String username) throws Exception{
         String code = mailService.sendSimpleMessage(username);
         session.setAttribute("code", code);
         return ResponseEntity.ok(code);
     }
 	
-	@PostMapping("/join/verifyCode")
+	@PostMapping("/travelo/verifyCode")
 	public ResponseEntity<?> verifyCode(HttpSession session, @RequestBody VerifyCodeDto verifyCodeDto) throws Exception{
 		boolean result=false;
         if(session.getAttribute("code").equals(verifyCodeDto.getVerifyCode())){

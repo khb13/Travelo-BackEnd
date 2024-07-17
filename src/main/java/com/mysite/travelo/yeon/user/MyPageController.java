@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -105,18 +104,18 @@ public class MyPageController {
     }
     
     @PostMapping("/travelo/check")
-    public ResponseEntity<String> checkUser(@RequestParam Map<String, String> map, HttpSession session) {
+    public ResponseEntity<String> checkUser(@RequestParam(value = "username") String username, HttpSession session) {
     	
     	// Null 체크
-        if (!StringUtils.hasText(map.get("username")) || !StringUtils.hasText(map.get("tel"))) {
-            return new ResponseEntity<>("모든 필드를 채워주세요", HttpStatus.BAD_REQUEST);
+        if (!StringUtils.hasText(username)) {
+            return new ResponseEntity<>("이메일을 입력해주세요", HttpStatus.BAD_REQUEST);
         }
     	
-        SiteUser loginUser = userService.getUser(map.get("username"));
+        SiteUser loginUser = userService.getUser(username);
         
-        if (loginUser.getUsername().equals(map.get("username")) && loginUser.getTel().equals(map.get("tel"))) {
+        if (loginUser.getUsername().equals(username)) {
         	session.setAttribute("username", loginUser.getUsername());
-        	return ResponseEntity.ok("회원 정보가 일치합니다");
+        	return ResponseEntity.ok("유효한 이메일입니다");
         }
         
         return new ResponseEntity<>("해당하는 정보가 없습니다", HttpStatus.NOT_FOUND);
