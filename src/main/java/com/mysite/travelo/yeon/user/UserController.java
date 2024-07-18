@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"})
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"}, allowCredentials = "true")
 public class UserController {
 
 	private final UserService userService;
@@ -41,10 +41,16 @@ public class UserController {
 	
 	@PostMapping("/travelo/join")
     public ResponseEntity<String> join(@RequestParam Map<String, String> map) {
-		
+            System.out.println("username" + map.get("username"));
+            System.out.println("password" + map.get("password"));
+            System.out.println("passwordCheck" + map.get("passwordCheck"));
+            System.out.println("tel" + map.get("tel"));
+
 		// Null 체크
-        if (!StringUtils.hasText(map.get("username")) || !StringUtils.hasText(map.get("password")) || 
+        if (!StringUtils.hasText(map.get("username")) || !StringUtils.hasText(map.get("password")) ||
             !StringUtils.hasText(map.get("passwordCheck")) || !StringUtils.hasText(map.get("tel"))) {
+
+
         	return new ResponseEntity<>("모든 필드를 채워주세요", HttpStatus.BAD_REQUEST);
         }
 		
@@ -78,11 +84,25 @@ public class UserController {
         String code = mailService.sendSimpleMessage(username);
         session.setAttribute("username", username);
         session.setAttribute("code", code);
+
+        String sessionUsername = (String) session.getAttribute("username");
+        String sessionCode = (String) session.getAttribute("code");
+
+        System.out.println("세션에서 가져온 username: " + sessionUsername);
+        System.out.println("세션에서 가져온 code: " + sessionCode);
+
         return ResponseEntity.ok(code);
     }
 	
 	@PostMapping("/travelo/verifyCode")
 	public ResponseEntity<?> verifyCode(HttpSession session, @RequestBody VerifyCodeDto verifyCodeDto) throws Exception{
+        String sessionUsername = (String) session.getAttribute("username");
+        String sessionCode = (String) session.getAttribute("code");
+
+        System.out.println("세션에서 가져온 username: " + sessionUsername);
+        System.out.println("세션에서 가져온 code: " + sessionCode);
+        System.out.println("요청에서 받은 username: " + verifyCodeDto.getUsername());
+        System.out.println("요청에서 받은 verifyCode: " + verifyCodeDto.getVerifyCode());
 		boolean result=false;
         if(session.getAttribute("username").equals(verifyCodeDto.getUsername()) && session.getAttribute("code").equals(verifyCodeDto.getVerifyCode())){
             result = true;
