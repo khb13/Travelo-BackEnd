@@ -76,11 +76,4 @@ public class MainController {
 		return ResponseEntity.ok(response);
 	}
 	
-	@PreAuthorize("isAuthenticated()")
-    @GetMapping("/admin")
-    public String adminPage(Model model) {
-		
-        return "인가 성공!";
-    }
-	
 }

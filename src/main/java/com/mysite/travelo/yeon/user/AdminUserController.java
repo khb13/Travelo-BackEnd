@@ -22,7 +22,7 @@ public class AdminUserController {
 
 	@Autowired
 	private UserService userService;
-//	private ReviewService reviewService;
+	@Autowired
 	
 	@GetMapping("/getAllUser")
 	public ResponseEntity<?> getAllUser() {
@@ -77,6 +77,18 @@ public class AdminUserController {
 		userService.resign(user);
 		
 		return ResponseEntity.ok("탈퇴 시켰습니다.");
+	}
+	
+	@GetMapping("/userDetail/{userSeq}")
+	public ResponseEntity<?> userDetail(@PathVariable("userSeq") Integer userSeq) {
+		
+		SiteUser user = userService.getUser(userSeq);
+		
+		if (user == null) {
+			return new ResponseEntity<>("userSeq에 해당하는 회원이 없습니다", HttpStatus.NOT_FOUND);
+		}
+		
+		return ResponseEntity.ok(user);
 	}
 	
 }

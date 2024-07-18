@@ -27,4 +27,14 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 	
 //	특정 유저의 블라인드 된 댓글 전체보기
 	List<Review> findByBlindYnAndUserUserSeq(String blindYn, Integer userSeq);
+	
+//	전체 유저의 블라인드 된 댓글 전체보기
+	List<Review> findByBlindYn(String blindYn);
+	
+//	신고 수 5회 이상인 비공개 댓글 전체보기(정렬 디폴트값: 오래된 순)
+	List<Review> findByReportCountGreaterThanEqual(Integer reportCount);
+	
+	Page<Review> findByBlindYn(String blindYn, Pageable pageable);
+	
+	Page<Review> findByUserUserSeq(Integer userSeq, Pageable pageable);
 }

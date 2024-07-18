@@ -31,5 +31,9 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 	List<Course> findAllByPrivateYnOrderByLikeCountDescViewCountDesc(String privateYn, Pageable pageable);
 	
 	List<Course> findByAuthor(SiteUser author);
+	
 	List<Course> findByAuthorAndAreaCode(SiteUser author, String areaCode);
+	
+	Page<Course> findByAuthor(SiteUser author, Pageable pageable);
+	
 }

@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.mysite.travelo.yeon.user.SiteUser;
@@ -73,6 +77,41 @@ public class CourseGroupService {
 		this.courseGroupRepository.save(courseGroup);
 		
 		return courseGroup;
+	}
+	
+	public Page<CourseGroup> getAllGroup(int page, String sortBy) {
+		
+		Pageable pageable;
+		
+        if ("latest".equals(sortBy)) {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순
+        } else if ("oldest".equals(sortBy)) {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.ASC, "createDate")); // 오래된순
+        } else {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순(디폴트)
+        }
+		
+        return courseGroupRepository.findAll(pageable);
+	}
+	
+	public List<CourseGroup> getAllGroupCount() {
+		
+		return courseGroupRepository.findAll();
+	}
+	
+	public Page<CourseGroup> getAllGroupByUser(String username, int page, String sortBy) {
+		
+		Pageable pageable;
+		
+		if ("latest".equals(sortBy)) {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순
+        } else if ("oldest".equals(sortBy)) {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.ASC, "createDate")); // 오래된순
+        } else {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순(디폴트)
+        }
+		
+		return courseGroupRepository.findByAuthorUsername(username, pageable);
 	}
 	
 }

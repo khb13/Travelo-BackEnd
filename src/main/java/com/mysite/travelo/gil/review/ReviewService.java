@@ -182,5 +182,66 @@ public class ReviewService {
 		return blindReviews;
 
 	}
+	
+	public List<Review> blindReviewAll() {
+		
+		return reviewRepository.findByBlindYn("Y");
+	}
+	
+	public List<Review> getAllReviewCount() {
+		
+		return reviewRepository.findAll(); 
+	}
 
+	public List<Review> getReportReviewCount() {
+		
+		return reviewRepository.findByReportCountGreaterThanEqual(5);
+	}
+	
+	public Page<Review> getAllReview(int page, String sortBy) {
+		
+		Pageable pageable = PageRequest.of(page, 15);
+		
+		if ("latest".equals(sortBy)) {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순
+		} else if ("oldest".equals(sortBy)) {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.ASC, "createDate")); // 오래된 순
+		} else {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순(디폴트)
+		}
+		
+		return reviewRepository.findAll(pageable);
+	}
+	
+	public Page<Review> getBlindReviews(int page, String blindYn, String sortBy) {
+		
+		Pageable pageable = PageRequest.of(page, 15);
+		
+		if ("latest".equals(sortBy)) {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순
+		} else if ("oldest".equals(sortBy)) {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.ASC, "createDate")); // 오래된 순
+		} else {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순(디폴트)
+		}
+		
+		return reviewRepository.findByBlindYn(blindYn, pageable);
+	}
+	
+	public Page<Review> getAllReviewByUser(Integer userSeq, int page, String sortBy) {
+		
+		Pageable pageable = PageRequest.of(page, 15);
+		
+		if ("latest".equals(sortBy)) {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순
+		} else if ("oldest".equals(sortBy)) {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.ASC, "createDate")); // 오래된 순
+		} else {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순(디폴트)
+		}
+		
+		return reviewRepository.findByUserUserSeq(userSeq, pageable);
+		
+	}
+	
 }

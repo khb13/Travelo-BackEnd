@@ -136,5 +136,57 @@ public class CourseService {
         
         return courseRepository.findAllByPrivateYnOrderByLikeCountDescViewCountDesc("N", pageable);
     }
+	
+	// 코스 목록 불러오기(정렬 디폴트값: 최신순 / 옵션값: 오래된순)
+	public Page<Course> getAllCourse(int page, String sortBy) {
+		
+		Pageable pageable;
+		
+        if ("latest".equals(sortBy)) {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순
+        } else if ("oldest".equals(sortBy)) {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.ASC, "createDate")); // 오래된순
+        } else {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순(디폴트)
+        }
+        
+    	return courseRepository.findAll(pageable);
+	}
+	
+	// 코스 목록 불러오기(정렬 디폴트값: 최신순 / 옵션값: 오래된순)
+	public Page<Course> getVisibleCourses(int page, String privateYn, String sortBy) {
+		
+		Pageable pageable;
+		
+        if ("latest".equals(sortBy)) {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순
+        } else if ("oldest".equals(sortBy)) {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.ASC, "createDate")); // 오래된순
+        } else {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순(디폴트)
+        }
+        
+        return courseRepository.findAllByPrivateYn(privateYn, pageable);
+	}
+
+	public List<Course> getAllCourseCount() {
+		
+        return courseRepository.findAll();
+	}
+	
+	public Page<Course> getAllCourseByUser(SiteUser author, int page, String sortBy) {
+		
+		Pageable pageable;
+		
+		if ("latest".equals(sortBy)) {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순
+        } else if ("oldest".equals(sortBy)) {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.ASC, "createDate")); // 오래된순
+        } else {
+        	pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순
+        }
+		
+		return courseRepository.findByAuthor(author, pageable);
+	}
 
 }
