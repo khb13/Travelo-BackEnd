@@ -85,29 +85,18 @@ public class UserController {
         session.setAttribute("username", username);
         session.setAttribute("code", code);
 
-        String sessionUsername = (String) session.getAttribute("username");
-        String sessionCode = (String) session.getAttribute("code");
-
-        System.out.println("세션에서 가져온 username: " + sessionUsername);
-        System.out.println("세션에서 가져온 code: " + sessionCode);
-
         return ResponseEntity.ok(code);
     }
 	
 	@PostMapping("/travelo/verifyCode")
 	public ResponseEntity<?> verifyCode(HttpSession session, @RequestBody VerifyCodeDto verifyCodeDto) throws Exception{
-        String sessionUsername = (String) session.getAttribute("username");
-        String sessionCode = (String) session.getAttribute("code");
-
-        System.out.println("세션에서 가져온 username: " + sessionUsername);
-        System.out.println("세션에서 가져온 code: " + sessionCode);
-        System.out.println("요청에서 받은 username: " + verifyCodeDto.getUsername());
-        System.out.println("요청에서 받은 verifyCode: " + verifyCodeDto.getVerifyCode());
 		boolean result=false;
+		
         if(session.getAttribute("username").equals(verifyCodeDto.getUsername()) && session.getAttribute("code").equals(verifyCodeDto.getVerifyCode())){
             result = true;
             session.invalidate();
         }
+        
         return ResponseEntity.ok(result);
     }
 	

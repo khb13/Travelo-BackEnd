@@ -154,11 +154,15 @@ public class AdminController {
 		
 		Page<CourseGroup> groups = courseGroupService.getAllGroup(page, sortBy);
 		
+		if (groups == null) {
+			return new ResponseEntity<>("그룹이 없습니다", HttpStatus.NOT_FOUND);
+		}
+		
 		return ResponseEntity.ok(groups);
 	}
 	
 	@GetMapping("/groups/{userSeq}")
-	public String adminGroupsByUser(@PathVariable("userSeq") Integer userSeq,
+	public ResponseEntity<?> adminGroupsByUser(@PathVariable("userSeq") Integer userSeq,
 			@RequestParam(defaultValue = "0") int page, 
 			@RequestParam(value = "sortBy", defaultValue = "latest") String sortBy) {
 		
@@ -166,7 +170,11 @@ public class AdminController {
 		
 		Page<CourseGroup> groups = courseGroupService.getAllGroupByUser(user.getUsername(), page, sortBy);
 		
-		return new String();
+		if (groups == null) {
+			return new ResponseEntity<>("그룹이 없습니다", HttpStatus.NOT_FOUND);
+		}
+		
+		return ResponseEntity.ok(groups);
 	}
 	
 	
