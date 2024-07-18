@@ -41,21 +41,25 @@ public class AdminController {
 		
 		Map<String, Object> response = new HashMap<>(); 
 		
+		// 전체 회원 수
+		List<SiteUser> users = userService.getAllUsersCount();
+		response.put("user count", users.size());
+		
 		// 전체 코스 개수
 		List<Course> courses = courseService.getAllCourseCount();
-		response.put("courseCnt", courses.size());
+		response.put("course count", courses.size());
 		
 		// 전체 후기 개수
 		List<Review> reviews = reviewService.getAllReviewCount();
-		response.put("reviewCnt", reviews.size());
+		response.put("review count", reviews.size());
 		
 		// 신고 수 5개 이상인 후기 개수
 		List<Review> reportReviews = reviewService.getReportReviewCount();
-		response.put("blindReviewCnt", reportReviews.size());
+		response.put("reported5plus count", reportReviews.size());
 		
 		// 전체 그룹 개수
 		List<CourseGroup> groups = courseGroupService.getAllGroupCount();
-		response.put("groupCnt", groups.size());
+		response.put("group count", groups.size());
 		
         return ResponseEntity.ok(response);
     }

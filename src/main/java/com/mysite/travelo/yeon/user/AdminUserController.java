@@ -22,12 +22,12 @@ public class AdminUserController {
 
 	@Autowired
 	private UserService userService;
-	@Autowired
 	
 	@GetMapping("/getAllUser")
-	public ResponseEntity<?> getAllUser() {
+	public ResponseEntity<?> getAllUser(@RequestParam(defaultValue = "0") int page, 
+			@RequestParam(value = "sortBy", defaultValue = "latest") String sortBy) {
 		
-		Page<SiteUser> userList =  userService.getAllUsers();
+		Page<SiteUser> userList =  userService.getAllUsers(page, sortBy);
 		
 		if (userList.isEmpty()) {
 			return new ResponseEntity<>("회원이 없습니다", HttpStatus.NOT_FOUND);
@@ -37,14 +37,16 @@ public class AdminUserController {
 	}
 	
 	@GetMapping("/getUsers")
-    public ResponseEntity<?> getUsers(@RequestParam(name = "active", defaultValue = "true") boolean active) {
+    public ResponseEntity<?> getUsers(@RequestParam(name = "page", defaultValue = "0") int page,
+    		@RequestParam(value = "sortBy", defaultValue = "latest") String sortBy,
+    		@RequestParam(name = "active", defaultValue = "true") boolean active) {
         
 		Page<SiteUser> userList = null;
 		
 		if (active) {
-        	userList = userService.getActiveUsers("N");
+        	userList = userService.getActiveUsers(page, sortBy, "N");
         } else {
-        	userList = userService.getActiveUsers("Y");
+        	userList = userService.getActiveUsers(page, sortBy, "Y");
         }
 		
 		if (userList == null) {

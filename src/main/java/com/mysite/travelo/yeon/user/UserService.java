@@ -1,12 +1,14 @@
 package com.mysite.travelo.yeon.user;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -137,17 +139,38 @@ public class UserService {
 	}
 	
 	// 전체 회원 목록
-	public Page<SiteUser> getAllUsers() {
-        Pageable pageable = PageRequest.of(0, 15); 
+	public Page<SiteUser> getAllUsers(int page, String sortBy) {
+        Pageable pageable = PageRequest.of(page, 15); 
+        
+        if ("latest".equals(sortBy)) {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "registerDate")); // 최신순
+		} else if ("oldest".equals(sortBy)) {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.ASC, "registerDate")); // 오래된 순
+		} else {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "registerDate")); // 최신순(디폴트)
+		}
         
         return userRepository.findByRole(pageable, UserRole.USER);
     }
 	
 	// 탈퇴 여부에 따른 회원 목록
-	public Page<SiteUser> getActiveUsers(String delYn) {
-		Pageable pageable = PageRequest.of(0, 15);
+	public Page<SiteUser> getActiveUsers(int page, String sortBy, String delYn) {
+		Pageable pageable = PageRequest.of(page, 15);
+		
+		if ("latest".equals(sortBy)) {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "registerDate")); // 최신순
+		} else if ("oldest".equals(sortBy)) {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.ASC, "registerDate")); // 오래된 순
+		} else {
+			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "registerDate")); // 최신순(디폴트)
+		}
 		
 		return userRepository.findByRoleAndDelYn(pageable, UserRole.USER, delYn);
+	}
+	
+	public List<SiteUser> getAllUsersCount() {
+		
+		return userRepository.findAll();
 	}
 	
 }
