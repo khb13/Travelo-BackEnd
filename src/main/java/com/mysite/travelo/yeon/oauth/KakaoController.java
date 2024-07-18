@@ -1,4 +1,4 @@
-package com.mysite.travelo.yeon.user;
+package com.mysite.travelo.yeon.oauth;
 
 import java.util.Map;
 
@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+
+import com.mysite.travelo.yeon.user.AuthResponse;
+import com.mysite.travelo.yeon.user.JWTUtil;
+import com.mysite.travelo.yeon.user.SiteUser;
+import com.mysite.travelo.yeon.user.UserService;
 
 import lombok.RequiredArgsConstructor;
 

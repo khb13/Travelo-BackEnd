@@ -51,11 +51,44 @@ public class UserService {
 		
 		SiteUser user = new SiteUser();
 		user.setUsername(username);
-//		user.setTel(map.get("tel"));
+		user.setPassword(bCryptPasswordEncoder.encode("1111"));
 		user.setRole(UserRole.USER);
 		user.setRegisterDate(LocalDateTime.now());
 		user.setDelYn("N");
 		user.setOauth("kakao");
+		
+		userRepository.save(user);
+	}
+	
+	public void joinGoogle(String username) {
+		if (userRepository.existsByUsername(username)) {
+			return;
+		}
+		
+		SiteUser user = new SiteUser();
+		user.setUsername(username);
+		user.setPassword(bCryptPasswordEncoder.encode("1111"));
+		user.setRole(UserRole.USER);
+		user.setRegisterDate(LocalDateTime.now());
+		user.setDelYn("N");
+		user.setOauth("google");
+		
+		userRepository.save(user);
+	}
+	
+	public void joinNaver(String username, String tel) {
+		if (userRepository.existsByUsername(username)) {
+			return;
+		}
+		
+		SiteUser user = new SiteUser();
+		user.setUsername(username);
+		user.setPassword(bCryptPasswordEncoder.encode("1111"));
+		user.setTel(tel);
+		user.setRole(UserRole.USER);
+		user.setRegisterDate(LocalDateTime.now());
+		user.setDelYn("N");
+		user.setOauth("naver");
 		
 		userRepository.save(user);
 	}
