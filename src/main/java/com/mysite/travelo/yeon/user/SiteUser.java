@@ -42,6 +42,8 @@ public class SiteUser {
 	@Enumerated(EnumType.STRING)
 	private UserRole role;
 	
-	private String Oauth;
+	private String oauthType;
+	
+	private String oauthId;
 	
 }

@@ -38,7 +38,7 @@ public class MailService {
         String msg = "<html><body style='font-family: Arial, sans-serif;'>";
         msg += "<div style='margin: 50px auto; width: 80%; text-align: center; border: 1px solid #ccc; padding: 20px;'>";
         msg += "<h1 style='color: #4d76b3;'>안녕하세요!</h1>";
-        msg += "<p style='font-size: 18px;'>아래 인증 코드를 회원가입 창에서 입력해주세요</p>";
+        msg += "<p style='font-size: 18px;'>아래 인증 코드를 입력해주세요</p>";
         msg += "<div style='background-color: #f0f0f0; padding: 10px;'>";
         msg += "<h3 style='color: #4d76b3;'>회원가입 인증 코드</h3>";
         msg += "<p style='font-size: 24px; font-weight: bold;'>" + authNum + "</p>";

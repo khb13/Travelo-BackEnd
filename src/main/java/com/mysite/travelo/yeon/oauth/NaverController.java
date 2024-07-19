@@ -1,5 +1,6 @@
 package com.mysite.travelo.yeon.oauth;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -29,6 +31,7 @@ import org.springframework.web.client.RestTemplate;
 public class NaverController {
 
 	private final UserService userService;
+	private final OAuthTokenService oAuthTokenService;
 	private final JWTUtil jwtUtil;
 	
 	@Value("${NAVER_CLIENT_ID}")
@@ -67,6 +70,7 @@ public class NaverController {
 
 	    // 액세스 토큰
 	    String accessToken = (String) response.getBody().get("access_token");
+	    String refreshToken = (String) response.getBody().get("refresh_token");
 
 	    System.out.println(accessToken);
 	    
@@ -86,6 +90,7 @@ public class NaverController {
 	    
 	    Map<String, Object> responseBody = userInfoResponse.getBody();
 	    Map<String, Object> response2 = (Map<String, Object>) responseBody.get("response");
+	    
 	    String email = (String) response2.get("email");
 	    String tel = (String) response2.get("mobile_e164");
 	    tel = "0" + extractPhoneNumber(tel);
@@ -103,10 +108,28 @@ public class NaverController {
 	    if ("Y".equals(oldUser.getDelYn())) {
 	        return new ResponseEntity<>("탈퇴한 회원입니다", HttpStatus.BAD_REQUEST);
 	    }
+	    
+	    if (oldUser.getOauthType() != null && !oldUser.getOauthType().equals("naver")) {
+	    	return new ResponseEntity<>("다른 소셜 플랫폼을 이용해서 해당 이메일로 가입한 적이 있습니다", HttpStatus.BAD_REQUEST);
+	    }
+	    
+	    OAuthToken oAuthToken = oAuthTokenService.getToken(oldUser);
+	    
+	    Map<String, Object> map = new HashMap<>();
+    	map.put("accessToken", accessToken);
+    	map.put("refreshToken", refreshToken);
+    	map.put("user", oldUser);
+    	
+	    // 토큰이 저장되어 있는 경우 기존 걸 수정
+	    if (oAuthToken != null) {
+	    	oAuthTokenService.modifyToken(map);
+	    } else {
+	    	oAuthTokenService.saveToken(map);
+	    }
 
 	    // JWT 토큰 생성 및 반환
 	    String jwtToken = jwtUtil.createJwt(oldUser.getUsername(), oldUser.getRole().toString(), 1000 * 60 * 60L);
-	    String refreshToken = jwtUtil.generateRefreshToken(oldUser.getUsername(), oldUser.getRole().toString(), 1000 * 60 * 60 * 24 * 7);
+	    refreshToken = jwtUtil.generateRefreshToken(oldUser.getUsername(), oldUser.getRole().toString(), 1000 * 60 * 60 * 24 * 7);
 
 	    AuthResponse authResponse = new AuthResponse(jwtToken, refreshToken);
 
@@ -122,6 +145,86 @@ public class NaverController {
 	    String phoneNumber = phoneNumberWithPrefix.replaceAll("[^0-9]", "");
 	    
 	    return phoneNumber;
+	}
+	
+	// 네이버 접근 토큰 갱신
+	@GetMapping("/user/naverToken")
+	public ResponseEntity<String> naverToken(Authentication auth) {
+		
+		SiteUser user = userService.getLoginUserByUsername(auth.getName());
+		OAuthToken token = oAuthTokenService.getToken(user);
+		
+    	RestTemplate restTemplate = new RestTemplate();
+
+	    // 헤더
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+	    
+	    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add("client_id", clientId);
+		params.add("client_secret", scecretKey);
+		params.add("refresh_token", token.getRefreshToken());
+		params.add("grant_type", "refresh_token");
+	    
+	    HttpEntity<MultiValueMap<String, String>> naverInfo = new HttpEntity<>(params, headers);
+
+	    ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+        		"https://nid.naver.com/oauth2.0/token",
+                HttpMethod.POST,
+                naverInfo,
+                new ParameterizedTypeReference<Map<String, Object>>() {});
+
+	    // 액세스 토큰
+	    String accessToken = (String) response.getBody().get("access_token");
+	    String refreshToken = (String) response.getBody().get("refresh_token");
+	    
+	    OAuthToken oAuthToken = oAuthTokenService.getToken(user);
+
+	    Map<String, Object> map = new HashMap<>();
+    	map.put("accessToken", accessToken);
+    	map.put("refreshToken", refreshToken);
+    	map.put("user", user);
+    	
+	    // 토큰이 저장되어 있는 경우 기존 걸 수정
+	    if (oAuthToken != null) {
+	    	oAuthTokenService.modifyToken(map);
+	    } else {
+	    	oAuthTokenService.saveToken(map);
+	    }
+	    
+	    return ResponseEntity.ok("토큰 갱신되었습니다");
+	}
+	
+	
+	// 네이버 연동 해제
+	@GetMapping("/user/naverUnlink")
+	public ResponseEntity<String> naverUnlink(Authentication auth) {
+		
+		SiteUser user = userService.getLoginUserByUsername(auth.getName());
+		OAuthToken token = oAuthTokenService.getToken(user);
+		
+    	RestTemplate restTemplate = new RestTemplate();
+
+	    // 헤더
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+	    
+	    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add("client_id", clientId);
+		params.add("client_secret", scecretKey);
+		params.add("access_token", token.getAccessToken());
+		params.add("grant_type", "delete");
+	    
+	    HttpEntity<MultiValueMap<String, String>> naverInfo = new HttpEntity<>(params, headers);
+	    ResponseEntity<String> response = restTemplate.exchange(
+	            "https://nid.naver.com/oauth2.0/token",
+	            HttpMethod.POST,
+	            naverInfo,
+	            String.class);
+	    
+	    oAuthTokenService.deleteToken(user);
+
+	    return response;
 	}
 	
 }

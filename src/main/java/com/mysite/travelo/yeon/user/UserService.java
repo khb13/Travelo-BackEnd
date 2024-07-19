@@ -44,7 +44,7 @@ public class UserService {
 		userRepository.save(user);
 	}
 	
-	public void joinKakao(String username) {
+	public void joinKakao(String username, String id) {
 		if (userRepository.existsByUsername(username)) {
 			return;
 		}
@@ -55,7 +55,8 @@ public class UserService {
 		user.setRole(UserRole.USER);
 		user.setRegisterDate(LocalDateTime.now());
 		user.setDelYn("N");
-		user.setOauth("kakao");
+		user.setOauthType("kakao");
+		user.setOauthId(id);
 		
 		userRepository.save(user);
 	}
@@ -71,7 +72,7 @@ public class UserService {
 		user.setRole(UserRole.USER);
 		user.setRegisterDate(LocalDateTime.now());
 		user.setDelYn("N");
-		user.setOauth("google");
+		user.setOauthType("google");
 		
 		userRepository.save(user);
 	}
@@ -88,7 +89,7 @@ public class UserService {
 		user.setRole(UserRole.USER);
 		user.setRegisterDate(LocalDateTime.now());
 		user.setDelYn("N");
-		user.setOauth("naver");
+		user.setOauthType("naver");
 		
 		userRepository.save(user);
 	}

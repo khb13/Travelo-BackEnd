@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -32,8 +33,11 @@ public class KakaoController {
 	private final UserService userService;
 	private final JWTUtil jwtUtil;
 	
-	@Value("${KAKAO_KEY}")
-	private String kakao;
+	@Value("${KAKAO_API_KEY}")
+	private String kakaoApi;
+	
+	@Value("${KAKAO_ADMIN_KEY}")
+	private String kakaoAdmin;
 	
 	@GetMapping("/travelo/kakaoCallback")
 	public ResponseEntity<?> kakaoCallback(@RequestParam String code) {
@@ -48,7 +52,7 @@ public class KakaoController {
 	    // 바디 설정
 	    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 	    params.add("grant_type", "authorization_code");
-	    params.add("client_id", kakao); // Kakao에서 발급한 REST API Key 입력
+	    params.add("client_id", kakaoApi); // Kakao에서 발급한 REST API Key 입력
 	    params.add("redirect_uri", "http://localhost:8080/travelo/kakaoCallback"); // Kakao 개발자 센터에서 설정한 리다이렉트 URI
 	    params.add("code", code);
 
@@ -70,12 +74,12 @@ public class KakaoController {
 
 	    // 사용자 정보에서 이메일 추출
 	    String username = extractEmail(response2.getBody());
-//	    String tel = extractPhoneNumber(response2.getBody());
+	    String id = extractId(response2.getBody());
 
 	    SiteUser oldUser = userService.getUser(username);
 	    
 	    if (oldUser == null) {
-	        userService.joinKakao(username);
+	        userService.joinKakao(username, id);
 	        oldUser = userService.getUser(username);
 	    }
 	    
@@ -117,10 +121,40 @@ public class KakaoController {
         return json.substring(startIndex, endIndex);
     }
     
-    // 로그아웃
-    @GetMapping("/user/kakaoLogout")
-    public ResponseEntity<String> kakaoLogout() {
-    	
-    	return ResponseEntity.ok("카카오 로그아웃 성공");
+    // JSON에서 이메일 추출하는 메서드
+    private String extractId(String json) {
+    	int startIndex = json.indexOf("\"sub\":\"") + "\"sub\":\"".length();
+        int endIndex = json.indexOf("\"", startIndex);
+        String id = json.substring(startIndex, endIndex).replaceAll(",", "");
+        return id;
     }
+    
+    @GetMapping("/user/kakaoUnlink")
+    public ResponseEntity<String> kakaoUnlink(Authentication auth) {
+    	
+    	SiteUser user = userService.getLoginUserByUsername(auth.getName());
+    	String id = user.getOauthId();
+    	System.out.println(id + "///////////////");
+    	
+    	RestTemplate restTemplate = new RestTemplate();
+
+	    // 헤더
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.add("Authorization", "KakaoAK " + kakaoAdmin);
+	    headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+	    
+	    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+	    params.add("target_id_type", "user_id");
+	    params.add("target_id", id);
+	    
+	    HttpEntity<MultiValueMap<String, String>> kakaoInfo = new HttpEntity<>(params, headers);
+	    ResponseEntity<String> response = restTemplate.exchange(
+	            "https://kapi.kakao.com/v1/user/unlink",
+	            HttpMethod.POST,
+	            kakaoInfo,
+	            String.class);
+
+	    return response;
+    }
+    
 }
