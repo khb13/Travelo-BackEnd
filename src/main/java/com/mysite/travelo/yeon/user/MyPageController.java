@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"}, allowedHeaders = "*", allowCredentials = "true")
 public class MyPageController {
 	
 	private final UserService userService;
