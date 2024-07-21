@@ -54,12 +54,11 @@ public class GoogleController {
 	    // OAuth 토큰 요청 파라미터 설정
 	    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 	    params.add("code", code);
-	    params.add("client_id", clientId); // Google 개발자 콘솔에서 발급한 클라이언트 ID 입력
-	    params.add("client_secret", scecretKey); // Google 개발자 콘솔에서 발급한 클라이언트 시크릿 입력
+	    params.add("client_id", clientId); 
+	    params.add("client_secret", scecretKey); 
 	    params.add("redirect_uri", "http://localhost:8080/travelo/googleCallback");
 	    params.add("grant_type", "authorization_code");
-	    params.add("access_type", "offline"); // Refresh Token을 받기 위한 설정
-	    params.add("prompt", "consent"); // 사용자에게 동의를 강제로 요청
+	    params.add("access_type", "offline"); 
 
 	    // 헤더 + 바디 결합
 	    HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers1);

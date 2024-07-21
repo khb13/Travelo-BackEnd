@@ -93,7 +93,7 @@ public class UserController {
 		
         if(session.getAttribute("username").equals(verifyCodeDto.getUsername()) && session.getAttribute("code").equals(verifyCodeDto.getVerifyCode())){
             result = true;
-            session.invalidate();
+            session.removeAttribute("code");
         }
         
         return ResponseEntity.ok(result);
