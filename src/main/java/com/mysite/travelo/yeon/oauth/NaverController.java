@@ -111,7 +111,7 @@ public class NaverController {
 	    }
 	    
 	    if (oldUser.getOauthType() != null && !oldUser.getOauthType().equals("naver")) {
-	    	String error = "다른 소셜 플랫폼을 이용해서 해당 이메일로 가입한 적이 있습니다.";
+	    	String error = "사용자가 kakao 소셜 로그인을 이용해서 해당 이메일로 가입한 적이 있습니다.";
 	    	
 	    	Map<String, Object> map = new HashMap<>();
 	    	map.put("username", oldUser.getUsername());
