@@ -27,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"}, allowCredentials = "true")
 public class UserController {
 
 	private final UserService userService;
@@ -167,5 +166,5 @@ public class UserController {
         
         return ResponseEntity.ok("로그아웃 되었습니다");
     }
-    
+	
 }

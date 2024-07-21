@@ -46,4 +46,6 @@ public class SiteUser {
 	
 	private String oauthId;
 	
+	private LocalDateTime resignDate;
+	
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
@@ -103,7 +104,13 @@ public class GoogleController {
 	    }
 	    
 	    if (oldUser.getOauthType() != null && !oldUser.getOauthType().equals("google")) {
-	    	return new ResponseEntity<>("다른 소셜 플랫폼을 이용해서 해당 이메일로 가입한 적이 있습니다", HttpStatus.BAD_REQUEST);
+	    	String error = "다른 소셜 플랫폼을 이용해서 해당 이메일로 가입한 적이 있습니다.";
+	    	
+	    	Map<String, Object> map = new HashMap<>();
+	    	map.put("username", oldUser.getUsername());
+	    	map.put("error", error);
+	    
+	    	return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
 	    }
 	    
 	    OAuthToken oAuthToken = oAuthTokenService.getToken(oldUser);
@@ -154,6 +161,20 @@ public class GoogleController {
 	    oAuthTokenService.deleteToken(user);
 
 	    return response;
+	}
+	
+	@PostMapping("/travelo/integratedGoogle")
+	public ResponseEntity<AuthResponse> integratedGoogle(@RequestParam String username) {
+		
+		SiteUser user = userService.getUser(username);
+    	userService.modifyOauth(user, "google");
+    	
+    	String accessToken = jwtUtil.createJwt(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60L);
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60 * 24 * 7);
+	    
+        AuthResponse authResponse = new AuthResponse(accessToken, refreshToken);
+
+        return ResponseEntity.ok().body(authResponse);
 	}
 	
 }
