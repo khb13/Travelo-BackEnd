@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user/review")
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"})
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"} , allowedHeaders = "*", allowCredentials = "true")
 public class ReviewController {
 
 	private final UserService userService;

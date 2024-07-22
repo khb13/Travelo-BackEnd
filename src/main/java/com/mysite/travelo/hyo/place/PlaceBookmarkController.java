@@ -35,7 +35,7 @@ import java.util.Map;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/user/placebookmarks")
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"})
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"} , allowedHeaders = "*", allowCredentials = "true")
 public class PlaceBookmarkController {
 
 	private final UserService userService;
