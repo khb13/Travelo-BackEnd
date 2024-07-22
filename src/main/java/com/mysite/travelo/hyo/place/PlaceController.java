@@ -47,7 +47,6 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"} , allowedHeaders = "*", allowCredentials = "true")
 public class PlaceController {
 
 	private final UserService userService;

@@ -11,7 +11,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -103,7 +102,7 @@ public class GoogleController {
 	    }
 	    
 	    if (oldUser.getOauthType() != null && !oldUser.getOauthType().equals("google")) {
-	    	String error = "사용자가 kakao 소셜 로그인을 이용해서 해당 이메일로 가입한 적이 있습니다.";
+	    	String error = "사용자가 " + oldUser.getOauthType() + " 소셜 로그인을 이용해서 해당 이메일로 가입한 적이 있습니다.";
 	    	
 	    	Map<String, Object> map = new HashMap<>();
 	    	map.put("username", oldUser.getUsername());

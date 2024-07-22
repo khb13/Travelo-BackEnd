@@ -90,7 +90,6 @@ public class KakaoController {
 	    }
 	    
 	    if (oldUser.getOauthType() != null && !oldUser.getOauthType().equals("kakao")) {
-	    	
 	    	String error = "사용자가 " + oldUser.getOauthType() +  " 소셜 로그인을 이용해서 해당 이메일로 가입한 적이 있습니다.";
 	    	
 	    	Map<String, Object> map = new HashMap<>();
