@@ -198,16 +198,16 @@ public class PlaceController {
     }
     
 //	   좋아요 상태 전환
- @PreAuthorize("isAuthenticated()")
- @PostMapping("/user/place/like/{placeSeq}")
- public ResponseEntity<String> toggleLike(@PathVariable("placeSeq") Integer placeSeq,
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/user/place/like/{placeSeq}")
+    public ResponseEntity<String> toggleLike(@PathVariable("placeSeq") Integer placeSeq,
                                           Authentication auth) {
- 	
-     SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
-     
-     placeService.togglePlaceLike(placeSeq, loginUser);
-     
-     return new ResponseEntity<>("좋아요 상태가 전환되었습니다.", HttpStatus.OK);
+	 	
+	     SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+	     
+	     String likeYn = placeService.togglePlaceLike(placeSeq, loginUser);
+	     
+	     return new ResponseEntity<>(likeYn, HttpStatus.OK);
  }
 
     // 조회수

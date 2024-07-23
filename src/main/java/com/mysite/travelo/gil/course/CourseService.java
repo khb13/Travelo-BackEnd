@@ -81,7 +81,7 @@ public class CourseService {
 	}
 	
 //	좋아요 상태관리
-	public void toggleCourseLike(Integer courseSeq, SiteUser user) {
+	public String toggleCourseLike(Integer courseSeq, SiteUser user) {
 		
 		 // Course 엔티티를 가져옴
         Course course = courseRepository.findByCourseSeq(courseSeq);
@@ -89,15 +89,19 @@ public class CourseService {
         // 이미 좋아요가 존재하는지 확인
         Optional<CourseLike> ocl = courseLikeRepository.findByCourseAndAuthor(course, user);
 		
+        String likeYn;
+        
 	    if (ocl.isPresent()) {
 	        CourseLike courseLike = ocl.get();
 	        if ("Y".equals(courseLike.getLikeYn())) {
 	            // 현재 좋아요 상태면, 좋아요 취소로 변경 및 좋아요 갯수 감소
 	            courseLike.setLikeYn("N");
+	            likeYn = "N";
 	            decreaseLikeCount(courseSeq);
 	        } else {
 	            // 현재 좋아요 취소 상태면, 좋아요로 변경 및 좋아요 갯수 증가
 	            courseLike.setLikeYn("Y");
+	            likeYn = "Y";
 	            increaseLikeCount(courseSeq);
 	        }
 	        courseLikeRepository.save(courseLike);
@@ -107,9 +111,12 @@ public class CourseService {
             courseLike.setCourse(course);
             courseLike.setAuthor(user);
             courseLike.setLikeYn("Y");
+            likeYn = "Y";
             courseLikeRepository.save(courseLike);
             increaseLikeCount(courseSeq);
         }
+	    
+	    return likeYn;
 	}
 	
 //	코스 좋아요 수 증가

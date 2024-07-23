@@ -95,9 +95,9 @@ public class CourseController {
     	
         SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
         
-        courseService.toggleCourseLike(courseSeq, loginUser);
+        String likeYn = courseService.toggleCourseLike(courseSeq, loginUser);
         
-        return new ResponseEntity<>("좋아요 상태가 전환되었습니다.", HttpStatus.OK);
+        return new ResponseEntity<>(likeYn, HttpStatus.OK);
     }
 	
 //	코스 북마크에 코스 추가

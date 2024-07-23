@@ -103,9 +103,9 @@ public class ReviewController {
  	
      SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
      
-     reviewService.toggleReviewRecommend(reviewSeq, loginUser);
+     String recommendYn = reviewService.toggleReviewRecommend(reviewSeq, loginUser);
      
-     return new ResponseEntity<>("추천 상태가 전환되었습니다.", HttpStatus.OK);
+     return new ResponseEntity<>(recommendYn, HttpStatus.OK);
  }
 	
 //	댓글 신고 증가

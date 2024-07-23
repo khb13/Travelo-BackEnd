@@ -136,7 +136,7 @@ public class ReviewService {
 	}
 	
 //	추천 상태관리
-	public void toggleReviewRecommend(Integer reviewSeq, SiteUser user) {
+	public String toggleReviewRecommend(Integer reviewSeq, SiteUser user) {
 		
 		// Review 엔티티를 가져옴
 	    Optional<Review> optionalReview = reviewRepository.findById(reviewSeq);
@@ -144,16 +144,20 @@ public class ReviewService {
         
         // 이미 추천이 존재하는지 확인
         Optional<ReviewRecommend> orr = reviewRecommendRepository.findByReviewAndAuthor(review, user);
+        
+        String recommendYn;
 		
 	    if (orr.isPresent()) {
 	        ReviewRecommend reviewRecommend = orr.get();
 	        if ("Y".equals(reviewRecommend.getRecommendYn())) {
 	            // 현재 추천 상태면, 추천 취소로 변경 및 추천 갯수 감소
 	        	reviewRecommend.setRecommendYn("N");
+	        	recommendYn = "N";
 	        	decreaseRecommendCount(reviewSeq);
 	        } else {
 	            // 현재 추천 취소 상태면, 추천으로 변경 및 추천 갯수 증가
 	        	reviewRecommend.setRecommendYn("Y");
+	        	recommendYn = "Y";
 	        	increaseRecommendCount(reviewSeq);
 	        }
 	        reviewRecommendRepository.save(reviewRecommend);
@@ -163,9 +167,12 @@ public class ReviewService {
             reviewRecommend.setReview(review);
             reviewRecommend.setAuthor(user);
             reviewRecommend.setRecommendYn("Y");
+            recommendYn = "Y";
             reviewRecommendRepository.save(reviewRecommend);
             increaseRecommendCount(reviewSeq);
         }
+	    
+	    return recommendYn;
 	}
 	
 //	댓글 추천 수 증가
