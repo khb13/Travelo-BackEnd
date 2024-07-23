@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.mysite.travelo.DataNotFoundException;
 import com.mysite.travelo.gil.course.Course;
+import com.mysite.travelo.gil.course.CourseLike;
 import com.mysite.travelo.yeon.user.SiteUser;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
+	private final ReviewRecommendRepository reviewRecommendRepository;
 	
 //	특정 코스의 댓글 목록 조회(정렬 디폴트값: 인기순 / 옵션값: 최신순, 오래된순)
 	public Page<Review> getReviews(int page, Integer courseSeq, String sortBy) {
@@ -131,6 +133,39 @@ public class ReviewService {
 //	댓글 삭제
 	public void delete(Review review) {
 		this.reviewRepository.delete(review);
+	}
+	
+//	추천 상태관리
+	public void toggleReviewRecommend(Integer reviewSeq, SiteUser user) {
+		
+		// Review 엔티티를 가져옴
+	    Optional<Review> optionalReview = reviewRepository.findById(reviewSeq);
+	    Review review = optionalReview.get();
+        
+        // 이미 추천이 존재하는지 확인
+        Optional<ReviewRecommend> orr = reviewRecommendRepository.findByReviewAndAuthor(review, user);
+		
+	    if (orr.isPresent()) {
+	        ReviewRecommend reviewRecommend = orr.get();
+	        if ("Y".equals(reviewRecommend.getRecommendYn())) {
+	            // 현재 추천 상태면, 추천 취소로 변경 및 추천 갯수 감소
+	        	reviewRecommend.setRecommendYn("N");
+	        	decreaseRecommendCount(reviewSeq);
+	        } else {
+	            // 현재 추천 취소 상태면, 추천으로 변경 및 추천 갯수 증가
+	        	reviewRecommend.setRecommendYn("Y");
+	        	increaseRecommendCount(reviewSeq);
+	        }
+	        reviewRecommendRepository.save(reviewRecommend);
+	    } else {
+            // 추천이 존재하지 않을 경우 새로 추가
+            ReviewRecommend reviewRecommend = new ReviewRecommend();
+            reviewRecommend.setReview(review);
+            reviewRecommend.setAuthor(user);
+            reviewRecommend.setRecommendYn("Y");
+            reviewRecommendRepository.save(reviewRecommend);
+            increaseRecommendCount(reviewSeq);
+        }
 	}
 	
 //	댓글 추천 수 증가

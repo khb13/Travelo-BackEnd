@@ -87,25 +87,18 @@ public class CourseController {
 		return response;
 	}
 	
-//		코스 좋아요 수 증가
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/like/{courseSeq}")
-	public ResponseEntity<String> like(@PathVariable("courseSeq") Integer courseSeq) {
-		
-	    courseService.increaseLikeCount(courseSeq);
-	    
-	    return new ResponseEntity<>("좋아요가 1 증가했습니다.", HttpStatus.OK);
-	}
-	
-//		코스 좋아요 수 감소
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/removeLike/{courseSeq}")
-	public ResponseEntity<String> removeLike(@PathVariable("courseSeq") Integer courseSeq) {
-		
-	    courseService.decreaseLikeCount(courseSeq);
-	    
-	    return new ResponseEntity<>("좋아요가 1 감소했습니다.", HttpStatus.OK);
-	}
+//	   좋아요 상태 전환
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/like/{courseSeq}")
+    public ResponseEntity<String> toggleLike(@PathVariable("courseSeq") Integer courseSeq,
+                                             Authentication auth) {
+    	
+        SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+        
+        courseService.toggleCourseLike(courseSeq, loginUser);
+        
+        return new ResponseEntity<>("좋아요 상태가 전환되었습니다.", HttpStatus.OK);
+    }
 	
 //	코스 북마크에 코스 추가
 	@PreAuthorize("isAuthenticated()")

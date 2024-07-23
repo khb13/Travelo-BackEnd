@@ -1,11 +1,14 @@
 package com.mysite.travelo.gil.review;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.mysite.travelo.gil.course.Course;
+import com.mysite.travelo.gil.course.CourseLike;
 import com.mysite.travelo.yeon.user.SiteUser;
 
 public interface ReviewRepository extends JpaRepository<Review, Integer> {

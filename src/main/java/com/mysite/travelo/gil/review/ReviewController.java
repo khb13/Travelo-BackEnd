@@ -95,25 +95,18 @@ public class ReviewController {
 		return new ResponseEntity<>("댓글이 삭제되었습니다.", HttpStatus.OK);
 	}
 	
-//	댓글 추천 증가
+//	   추천 상태 전환
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/recommend/{reviewSeq}")
-	public ResponseEntity<String> recommend(@PathVariable("reviewSeq") Integer reviewSeq) {
-		
-		reviewService.increaseRecommendCount(reviewSeq);
-		
-		return new ResponseEntity<>("추천이 1 증가했습니다.", HttpStatus.OK);
-	}
-	
-//	댓글 추천 감소
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/removeRecommend/{reviewSeq}")
-	public ResponseEntity<String> removeRecommend(@PathVariable("reviewSeq") Integer reviewSeq) {
-
-		reviewService.decreaseRecommendCount(reviewSeq);
-		
-		return new ResponseEntity<>("추천이 1 감소했습니다.", HttpStatus.OK);
-	}
+	public ResponseEntity<String> toggleRecommend(@PathVariable("reviewSeq") Integer reviewSeq,
+                                          Authentication auth) {
+ 	
+     SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+     
+     reviewService.toggleReviewRecommend(reviewSeq, loginUser);
+     
+     return new ResponseEntity<>("추천 상태가 전환되었습니다.", HttpStatus.OK);
+ }
 	
 //	댓글 신고 증가
 	@PreAuthorize("isAuthenticated()")
