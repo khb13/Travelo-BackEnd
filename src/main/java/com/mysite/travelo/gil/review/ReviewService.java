@@ -25,6 +25,7 @@ public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
 	private final ReviewRecommendRepository reviewRecommendRepository;
+	private final ReviewReportRepository reviewReportRepository;
 	
 //	특정 코스의 댓글 목록 조회(정렬 디폴트값: 인기순 / 옵션값: 최신순, 오래된순)
 	public Page<Review> getReviews(int page, Integer courseSeq, String sortBy) {
@@ -190,6 +191,30 @@ public class ReviewService {
         review.setRecommendCount(review.getRecommendCount() - 1);
         reviewRepository.save(review);
 	}
+	
+//	신고 상태관리
+	public String uniqueReviewReport(Integer reviewSeq, SiteUser user) {
+
+        // Review 엔터티를 가져옴
+        Review review = getReview(reviewSeq);
+
+        // 이미 신고가 존재하는지 확인
+        Optional<ReviewReport> orr = reviewReportRepository.findByReviewAndAuthor(review, user);
+
+        if (orr.isPresent()) {
+            return "이미 신고한 리뷰입니다.";
+        } else {
+            // 신고가 존재하지 않을 경우 새로 추가
+            ReviewReport reviewReport = new ReviewReport();
+            reviewReport.setReview(review);
+            reviewReport.setAuthor(user);
+            reviewReport.setReportYn("Y");
+            reviewReportRepository.save(reviewReport);
+            increaseReportCount(reviewSeq);
+
+            return "리뷰가 신고되었습니다.";
+        }
+    }
 	
 //	댓글 신고 수 증가
 	public void increaseReportCount(Integer reviewSeq) {

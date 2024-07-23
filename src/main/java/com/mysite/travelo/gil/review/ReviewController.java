@@ -111,11 +111,14 @@ public class ReviewController {
 //	댓글 신고 증가
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/report/{reviewSeq}")
-	public ResponseEntity<String> report(@PathVariable("reviewSeq") Integer reviewSeq){
+	public ResponseEntity<String> report(@PathVariable("reviewSeq") Integer reviewSeq,
+										Authentication auth) {
 		
-		reviewService.increaseReportCount(reviewSeq);
+		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
 		
-		return new ResponseEntity<>("신고가 1 증가했습니다.", HttpStatus.OK);
+		String result = reviewService.uniqueReviewReport(reviewSeq, loginUser);
+		
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
 	
