@@ -125,8 +125,9 @@ public class CourseCustomController {
  // 삭제
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/delete")
-    public ResponseEntity<Map<String, Object>> deleteCustomCourse(Authentication auth, @Valid @RequestBody Integer courseSeq, BindingResult bindingResult, Principal principal){
+    public ResponseEntity<Map<String, Object>> deleteCustomCourse(Authentication auth, @Valid @RequestBody Map<String, Integer> requestBody, BindingResult bindingResult, Principal principal){
 
+        Integer courseSeq = requestBody.get("courseSeq");
         // 유효 여부 확인
         Map<String, Object> response = errorResponse(bindingResult,courseSeq, principal);
 
