@@ -7,8 +7,13 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.mysite.travelo.gil.course.Course;
+import com.mysite.travelo.gil.course.CourseLike;
+import com.mysite.travelo.yeon.user.SiteUser;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /* *
  * 장소 서비스
@@ -47,6 +52,7 @@ import java.util.List;
 public class PlaceService {
 
     private final PlaceRepository placeRepository;
+    private final PlaceLikeRepository placeLikeRepository;
 
     public List<Place> findPopularPlaces() {
         Pageable pageable = PageRequest.of(0, 6);
@@ -112,7 +118,44 @@ public class PlaceService {
         return this.placeRepository.findAll(spec);
     }
 
-    // 좋아요 기능
+//	좋아요 상태관리
+    public String togglePlaceLike(Integer placeSeq, SiteUser user) {
+        // Place 엔티티를 가져옴
+        Optional<Place> op = placeRepository.findByPlaceSeq(placeSeq);
+        Place place = op.get();
+
+        // 이미 좋아요가 존재하는지 확인
+        Optional<PlaceLike> opl = placeLikeRepository.findByPlaceAndAuthor(place, user);
+        
+        String likeYn;
+        
+        if (opl.isPresent()) {
+            PlaceLike placeLike = opl.get();
+            if ("Y".equals(placeLike.getLikeYn())) {
+                // 현재 좋아요 상태면, 좋아요 취소로 변경 및 좋아요 갯수 감소
+                placeLike.setLikeYn("N");
+                likeYn = "N";
+                decreaseLike(placeSeq);
+            } else {
+                // 현재 좋아요 취소 상태면, 좋아요로 변경 및 좋아요 갯수 증가
+                placeLike.setLikeYn("Y");
+                likeYn = "Y";
+                increaseLike(placeSeq);
+            }
+            placeLikeRepository.save(placeLike);
+        } else {
+            // 좋아요가 존재하지 않을 경우 새로 추가
+            PlaceLike placeLike = new PlaceLike();
+            placeLike.setPlace(place);
+            placeLike.setAuthor(user);
+            placeLike.setLikeYn("Y");
+            likeYn = "Y";
+            placeLikeRepository.save(placeLike);
+            increaseLike(placeSeq);
+        }
+        
+        return likeYn;
+    }
 
     // 좋아요 증가 감소
     @Transactional

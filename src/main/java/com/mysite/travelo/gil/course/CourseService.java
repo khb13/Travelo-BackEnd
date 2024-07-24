@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class CourseService {
 
 	private final CourseRepository courseRepository;
+	private final CourseLikeRepository courseLikeRepository;
 	
 //	코스 목록 불러오기(공개여부: 공개 / 정렬 디폴트값: 인기순 / 옵션값: 최신순, 오래된순)
 	public Page<Course> getCourses(int page, String privateYn, String sortBy, String areaCode, String type) {
@@ -79,11 +80,50 @@ public class CourseService {
 		return courseRepository.save(course);
 	}
 	
+//	좋아요 상태관리
+	public String toggleCourseLike(Integer courseSeq, SiteUser user) {
+		
+		 // Course 엔티티를 가져옴
+        Course course = courseRepository.findByCourseSeq(courseSeq);
+        
+        // 이미 좋아요가 존재하는지 확인
+        Optional<CourseLike> ocl = courseLikeRepository.findByCourseAndAuthor(course, user);
+		
+        String likeYn;
+        
+	    if (ocl.isPresent()) {
+	        CourseLike courseLike = ocl.get();
+	        if ("Y".equals(courseLike.getLikeYn())) {
+	            // 현재 좋아요 상태면, 좋아요 취소로 변경 및 좋아요 갯수 감소
+	            courseLike.setLikeYn("N");
+	            likeYn = "N";
+	            decreaseLikeCount(courseSeq);
+	        } else {
+	            // 현재 좋아요 취소 상태면, 좋아요로 변경 및 좋아요 갯수 증가
+	            courseLike.setLikeYn("Y");
+	            likeYn = "Y";
+	            increaseLikeCount(courseSeq);
+	        }
+	        courseLikeRepository.save(courseLike);
+	    } else {
+            // 좋아요가 존재하지 않을 경우 새로 추가
+            CourseLike courseLike = new CourseLike();
+            courseLike.setCourse(course);
+            courseLike.setAuthor(user);
+            courseLike.setLikeYn("Y");
+            likeYn = "Y";
+            courseLikeRepository.save(courseLike);
+            increaseLikeCount(courseSeq);
+        }
+	    
+	    return likeYn;
+	}
+	
 //	코스 좋아요 수 증가
 	public void increaseLikeCount(Integer courseSeq) {
 	    Course course = courseRepository.findByCourseSeq(courseSeq);
 	    
-	    course.setLikeCount(course.getLikeCount() + 1);
+    	course.setLikeCount(course.getLikeCount() + 1);
 	    
 	    courseRepository.save(course);
 	}

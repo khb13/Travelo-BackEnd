@@ -65,6 +65,7 @@ public class AdminController {
     }
 	
 	// 전체 코스
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/courses")
 	public ResponseEntity<?> adminCourses(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(value = "sortBy", defaultValue = "latest") String sortBy) {
@@ -79,6 +80,7 @@ public class AdminController {
 	}
 	
 	// private 여부에 따른 전체 코스
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/getVisibleCourses")
 	public ResponseEntity<?> adminCourses(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(value = "privateYn", defaultValue = "N") String privateYn,
@@ -94,6 +96,7 @@ public class AdminController {
 	}
 	
 	// 사용자에 따른 코스
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/courses/{userSeq}")
 	public ResponseEntity<?> adminCoursesByUser(@PathVariable("userSeq") Integer userSeq, 
 			@RequestParam(defaultValue = "0") int page,
@@ -110,7 +113,7 @@ public class AdminController {
 		return ResponseEntity.ok(courses);
 	}
 	
-	
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/reviews")
 	public ResponseEntity<?> adminReviews(@RequestParam(defaultValue = "0") int page, 
 			@RequestParam(value = "sortBy", defaultValue = "latest") String sortBy) {
@@ -124,6 +127,7 @@ public class AdminController {
 		return ResponseEntity.ok(reviews);
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/getBlindReviews")
 	public ResponseEntity<?> getBlindReviews(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(value = "blindYn", defaultValue = "N") String blindYn,
@@ -138,6 +142,7 @@ public class AdminController {
 		return ResponseEntity.ok(reviews);
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/reviews/{userSeq}")
 	public ResponseEntity<?> adminReviewsByUser(@PathVariable("userSeq") Integer userSeq, 
 			@RequestParam(defaultValue = "0") int page,
@@ -152,6 +157,7 @@ public class AdminController {
 		return ResponseEntity.ok(reviews);
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/groups")
 	public ResponseEntity<?> adminGroups(@RequestParam(defaultValue = "0") int page, 
 			@RequestParam(value = "sortBy", defaultValue = "latest") String sortBy) {
@@ -165,6 +171,7 @@ public class AdminController {
 		return ResponseEntity.ok(groups);
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/groups/{userSeq}")
 	public ResponseEntity<?> adminGroupsByUser(@PathVariable("userSeq") Integer userSeq,
 			@RequestParam(defaultValue = "0") int page, 
@@ -180,6 +187,5 @@ public class AdminController {
 		
 		return ResponseEntity.ok(groups);
 	}
-	
 	
 }

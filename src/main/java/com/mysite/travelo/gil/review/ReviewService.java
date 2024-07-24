@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.mysite.travelo.DataNotFoundException;
 import com.mysite.travelo.gil.course.Course;
+import com.mysite.travelo.gil.course.CourseLike;
 import com.mysite.travelo.yeon.user.SiteUser;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
+	private final ReviewRecommendRepository reviewRecommendRepository;
+	private final ReviewReportRepository reviewReportRepository;
 	
 //	특정 코스의 댓글 목록 조회(정렬 디폴트값: 인기순 / 옵션값: 최신순, 오래된순)
 	public Page<Review> getReviews(int page, Integer courseSeq, String sortBy) {
@@ -133,6 +136,46 @@ public class ReviewService {
 		this.reviewRepository.delete(review);
 	}
 	
+//	추천 상태관리
+	public String toggleReviewRecommend(Integer reviewSeq, SiteUser user) {
+		
+		// Review 엔티티를 가져옴
+	    Optional<Review> optionalReview = reviewRepository.findById(reviewSeq);
+	    Review review = optionalReview.get();
+        
+        // 이미 추천이 존재하는지 확인
+        Optional<ReviewRecommend> orr = reviewRecommendRepository.findByReviewAndAuthor(review, user);
+        
+        String recommendYn;
+		
+	    if (orr.isPresent()) {
+	        ReviewRecommend reviewRecommend = orr.get();
+	        if ("Y".equals(reviewRecommend.getRecommendYn())) {
+	            // 현재 추천 상태면, 추천 취소로 변경 및 추천 갯수 감소
+	        	reviewRecommend.setRecommendYn("N");
+	        	recommendYn = "N";
+	        	decreaseRecommendCount(reviewSeq);
+	        } else {
+	            // 현재 추천 취소 상태면, 추천으로 변경 및 추천 갯수 증가
+	        	reviewRecommend.setRecommendYn("Y");
+	        	recommendYn = "Y";
+	        	increaseRecommendCount(reviewSeq);
+	        }
+	        reviewRecommendRepository.save(reviewRecommend);
+	    } else {
+            // 추천이 존재하지 않을 경우 새로 추가
+            ReviewRecommend reviewRecommend = new ReviewRecommend();
+            reviewRecommend.setReview(review);
+            reviewRecommend.setAuthor(user);
+            reviewRecommend.setRecommendYn("Y");
+            recommendYn = "Y";
+            reviewRecommendRepository.save(reviewRecommend);
+            increaseRecommendCount(reviewSeq);
+        }
+	    
+	    return recommendYn;
+	}
+	
 //	댓글 추천 수 증가
 	public void increaseRecommendCount(Integer reviewSeq) {
 		
@@ -148,6 +191,30 @@ public class ReviewService {
         review.setRecommendCount(review.getRecommendCount() - 1);
         reviewRepository.save(review);
 	}
+	
+//	신고 상태관리
+	public String uniqueReviewReport(Integer reviewSeq, SiteUser user) {
+
+        // Review 엔터티를 가져옴
+        Review review = getReview(reviewSeq);
+
+        // 이미 신고가 존재하는지 확인
+        Optional<ReviewReport> orr = reviewReportRepository.findByReviewAndAuthor(review, user);
+
+        if (orr.isPresent()) {
+            return "이미 신고한 리뷰입니다.";
+        } else {
+            // 신고가 존재하지 않을 경우 새로 추가
+            ReviewReport reviewReport = new ReviewReport();
+            reviewReport.setReview(review);
+            reviewReport.setAuthor(user);
+            reviewReport.setReportYn("Y");
+            reviewReportRepository.save(reviewReport);
+            increaseReportCount(reviewSeq);
+
+            return "리뷰가 신고되었습니다.";
+        }
+    }
 	
 //	댓글 신고 수 증가
 	public void increaseReportCount(Integer reviewSeq) {
