@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ public class AdminUserController {
 	@Autowired
 	private UserService userService;
 	
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/getAllUser")
 	public ResponseEntity<?> getAllUser(@RequestParam(defaultValue = "0") int page, 
 			@RequestParam(value = "sortBy", defaultValue = "latest") String sortBy) {
@@ -36,6 +38,7 @@ public class AdminUserController {
 		return ResponseEntity.ok(userList);
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/getUsers")
     public ResponseEntity<?> getUsers(@RequestParam(name = "page", defaultValue = "0") int page,
     		@RequestParam(value = "sortBy", defaultValue = "latest") String sortBy,
@@ -56,6 +59,7 @@ public class AdminUserController {
 		return ResponseEntity.ok(userList);
     }
 
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/deleteUser/{userSeq}")
 	public ResponseEntity<?> deleteUser(@PathVariable("userSeq") Integer userSeq) {
 		/*
@@ -81,6 +85,7 @@ public class AdminUserController {
 		return ResponseEntity.ok("탈퇴 시켰습니다.");
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/userDetail/{userSeq}")
 	public ResponseEntity<?> userDetail(@PathVariable("userSeq") Integer userSeq) {
 		
