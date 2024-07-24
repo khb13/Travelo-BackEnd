@@ -2,15 +2,12 @@ package com.mysite.travelo.gil.review;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user/review")
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"})
 public class ReviewController {
 
 	private final UserService userService;
@@ -99,34 +95,30 @@ public class ReviewController {
 		return new ResponseEntity<>("댓글이 삭제되었습니다.", HttpStatus.OK);
 	}
 	
-//	댓글 추천 증가
+//	   추천 상태 전환
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/recommend/{reviewSeq}")
-	public ResponseEntity<String> recommend(@PathVariable("reviewSeq") Integer reviewSeq) {
-		
-		reviewService.increaseRecommendCount(reviewSeq);
-		
-		return new ResponseEntity<>("추천이 1 증가했습니다.", HttpStatus.OK);
-	}
-	
-//	댓글 추천 감소
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/removeRecommend/{reviewSeq}")
-	public ResponseEntity<String> removeRecommend(@PathVariable("reviewSeq") Integer reviewSeq) {
-
-		reviewService.decreaseRecommendCount(reviewSeq);
-		
-		return new ResponseEntity<>("추천이 1 감소했습니다.", HttpStatus.OK);
-	}
+	public ResponseEntity<String> toggleRecommend(@PathVariable("reviewSeq") Integer reviewSeq,
+                                          Authentication auth) {
+ 	
+     SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+     
+     String recommendYn = reviewService.toggleReviewRecommend(reviewSeq, loginUser);
+     
+     return new ResponseEntity<>(recommendYn, HttpStatus.OK);
+ }
 	
 //	댓글 신고 증가
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/report/{reviewSeq}")
-	public ResponseEntity<String> report(@PathVariable("reviewSeq") Integer reviewSeq){
+	public ResponseEntity<String> report(@PathVariable("reviewSeq") Integer reviewSeq,
+										Authentication auth) {
 		
-		reviewService.increaseReportCount(reviewSeq);
+		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
 		
-		return new ResponseEntity<>("신고가 1 증가했습니다.", HttpStatus.OK);
+		String result = reviewService.uniqueReviewReport(reviewSeq, loginUser);
+		
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
 	

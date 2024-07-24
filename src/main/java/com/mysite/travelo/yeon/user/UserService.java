@@ -158,9 +158,18 @@ public class UserService {
 		userRepository.save(loginUser);
 	}
 	
+	public void modifyOauth(SiteUser user, String oauth) {
+		
+		user.setOauthType(oauth);
+		user.setModifyDate(LocalDateTime.now());
+		
+		userRepository.save(user);
+	}
+	
 	// 탈퇴
 	public void resign(SiteUser loginUser) {
 		loginUser.setDelYn("Y");
+		loginUser.setResignDate(LocalDateTime.now()); 
 		
 		userRepository.save(loginUser);
 	}

@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"}, allowCredentials = "true")
 public class UserController {
 
 	private final UserService userService;
@@ -94,7 +92,7 @@ public class UserController {
 		
         if(session.getAttribute("username").equals(verifyCodeDto.getUsername()) && session.getAttribute("code").equals(verifyCodeDto.getVerifyCode())){
             result = true;
-            session.invalidate();
+            session.removeAttribute("code");
         }
         
         return ResponseEntity.ok(result);
@@ -167,5 +165,5 @@ public class UserController {
         
         return ResponseEntity.ok("로그아웃 되었습니다");
     }
-    
+	
 }

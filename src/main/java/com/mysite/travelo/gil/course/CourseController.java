@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 @RestController // JSON 형태로 반환할 것임을 명시
 @RequiredArgsConstructor
 @RequestMapping("/user/course")
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"})
 public class CourseController {
 	
 	private final UserService userService;
@@ -89,25 +87,18 @@ public class CourseController {
 		return response;
 	}
 	
-//		코스 좋아요 수 증가
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/like/{courseSeq}")
-	public ResponseEntity<String> like(@PathVariable("courseSeq") Integer courseSeq) {
-		
-	    courseService.increaseLikeCount(courseSeq);
-	    
-	    return new ResponseEntity<>("좋아요가 1 증가했습니다.", HttpStatus.OK);
-	}
-	
-//		코스 좋아요 수 감소
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/removeLike/{courseSeq}")
-	public ResponseEntity<String> removeLike(@PathVariable("courseSeq") Integer courseSeq) {
-		
-	    courseService.decreaseLikeCount(courseSeq);
-	    
-	    return new ResponseEntity<>("좋아요가 1 감소했습니다.", HttpStatus.OK);
-	}
+//	   좋아요 상태 전환
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/like/{courseSeq}")
+    public ResponseEntity<String> toggleLike(@PathVariable("courseSeq") Integer courseSeq,
+                                             Authentication auth) {
+    	
+        SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+        
+        String likeYn = courseService.toggleCourseLike(courseSeq, loginUser);
+        
+        return new ResponseEntity<>(likeYn, HttpStatus.OK);
+    }
 	
 //	코스 북마크에 코스 추가
 	@PreAuthorize("isAuthenticated()")

@@ -11,11 +11,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
@@ -53,12 +53,11 @@ public class GoogleController {
 	    // OAuth 토큰 요청 파라미터 설정
 	    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 	    params.add("code", code);
-	    params.add("client_id", clientId); // Google 개발자 콘솔에서 발급한 클라이언트 ID 입력
-	    params.add("client_secret", scecretKey); // Google 개발자 콘솔에서 발급한 클라이언트 시크릿 입력
+	    params.add("client_id", clientId); 
+	    params.add("client_secret", scecretKey); 
 	    params.add("redirect_uri", "http://localhost:8080/travelo/googleCallback");
 	    params.add("grant_type", "authorization_code");
-	    params.add("access_type", "offline"); // Refresh Token을 받기 위한 설정
-	    params.add("prompt", "consent"); // 사용자에게 동의를 강제로 요청
+	    params.add("access_type", "offline"); 
 
 	    // 헤더 + 바디 결합
 	    HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers1);
@@ -103,7 +102,13 @@ public class GoogleController {
 	    }
 	    
 	    if (oldUser.getOauthType() != null && !oldUser.getOauthType().equals("google")) {
-	    	return new ResponseEntity<>("다른 소셜 플랫폼을 이용해서 해당 이메일로 가입한 적이 있습니다", HttpStatus.BAD_REQUEST);
+	    	String error = "사용자가 " + oldUser.getOauthType() + " 소셜 로그인을 이용해서 해당 이메일로 가입한 적이 있습니다.";
+	    	
+	    	Map<String, Object> map = new HashMap<>();
+	    	map.put("username", oldUser.getUsername());
+	    	map.put("error", error);
+	    
+	    	return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
 	    }
 	    
 	    OAuthToken oAuthToken = oAuthTokenService.getToken(oldUser);
@@ -154,6 +159,20 @@ public class GoogleController {
 	    oAuthTokenService.deleteToken(user);
 
 	    return response;
+	}
+	
+	@PostMapping("/travelo/integratedGoogle")
+	public ResponseEntity<AuthResponse> integratedGoogle(@RequestParam String username) {
+		
+		SiteUser user = userService.getUser(username);
+    	userService.modifyOauth(user, "google");
+    	
+    	String accessToken = jwtUtil.createJwt(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60L);
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60 * 24 * 7);
+	    
+        AuthResponse authResponse = new AuthResponse(accessToken, refreshToken);
+
+        return ResponseEntity.ok().body(authResponse);
 	}
 	
 }

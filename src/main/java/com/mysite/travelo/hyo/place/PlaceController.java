@@ -2,6 +2,7 @@ package com.mysite.travelo.hyo.place;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -47,7 +48,6 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"})
 public class PlaceController {
 
 	private final UserService userService;
@@ -196,26 +196,19 @@ public class PlaceController {
 
         return ResponseEntity.ok(response);
     }
-
- // 좋아요 증가
+    
+//	   좋아요 상태 전환
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/user/place/{placeSeq}/like")
-    public ResponseEntity<Map<String, Object>> increaseLike(@PathVariable("placeSeq") int contentId) {
-        placeService.increaseLike(contentId);
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", "좋아요가 증가하였습니다.");
-        return ResponseEntity.ok(response);
-    }
-
-    // 좋아요 감소
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/user/place/{placeSeq}/removelike")
-    public ResponseEntity<Map<String, Object>> decreaseLike(@PathVariable("placeSeq") int contentId) {
-        placeService.decreaseLike(contentId);
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", "좋아요를 취소하였습니다.");
-        return ResponseEntity.ok(response);
-    }
+    @PostMapping("/user/place/like/{placeSeq}")
+    public ResponseEntity<String> toggleLike(@PathVariable("placeSeq") Integer placeSeq,
+                                          Authentication auth) {
+	 	
+	     SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+	     
+	     String likeYn = placeService.togglePlaceLike(placeSeq, loginUser);
+	     
+	     return new ResponseEntity<>(likeYn, HttpStatus.OK);
+ }
 
     // 조회수
     @PostMapping("/travelo/place/detail/{placeSeq}")

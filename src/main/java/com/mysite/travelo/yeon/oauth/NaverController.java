@@ -22,6 +22,7 @@ import com.mysite.travelo.yeon.user.UserService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
@@ -110,7 +111,13 @@ public class NaverController {
 	    }
 	    
 	    if (oldUser.getOauthType() != null && !oldUser.getOauthType().equals("naver")) {
-	    	return new ResponseEntity<>("다른 소셜 플랫폼을 이용해서 해당 이메일로 가입한 적이 있습니다", HttpStatus.BAD_REQUEST);
+	    	String error = "사용자가 " + oldUser.getOauthType() + " 소셜 로그인을 이용해서 해당 이메일로 가입한 적이 있습니다.";
+	    	
+	    	Map<String, Object> map = new HashMap<>();
+	    	map.put("username", oldUser.getUsername());
+	    	map.put("error", error);
+	    
+	    	return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
 	    }
 	    
 	    OAuthToken oAuthToken = oAuthTokenService.getToken(oldUser);
@@ -195,7 +202,6 @@ public class NaverController {
 	    return ResponseEntity.ok("토큰 갱신되었습니다");
 	}
 	
-	
 	// 네이버 연동 해제
 	@GetMapping("/user/naverUnlink")
 	public ResponseEntity<String> naverUnlink(Authentication auth) {
@@ -225,6 +231,19 @@ public class NaverController {
 	    oAuthTokenService.deleteToken(user);
 
 	    return response;
+	}
+	
+	@PostMapping("/travelo/integratedNaver")
+	public ResponseEntity<AuthResponse> integratedNaver(@RequestParam String username) {
+		SiteUser user = userService.getUser(username);
+    	userService.modifyOauth(user, "naver");
+    	
+    	String accessToken = jwtUtil.createJwt(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60L);
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60 * 24 * 7);
+	    
+        AuthResponse authResponse = new AuthResponse(accessToken, refreshToken);
+
+        return ResponseEntity.ok().body(authResponse);
 	}
 	
 }

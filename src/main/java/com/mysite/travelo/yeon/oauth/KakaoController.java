@@ -1,5 +1,6 @@
 package com.mysite.travelo.yeon.oauth;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
@@ -86,6 +88,16 @@ public class KakaoController {
 	    if (oldUser.getDelYn().equals("Y")) {
 	    	return new ResponseEntity<>("탈퇴한 회원입니다", HttpStatus.BAD_REQUEST);
 	    }
+	    
+	    if (oldUser.getOauthType() != null && !oldUser.getOauthType().equals("kakao")) {
+	    	String error = "사용자가 " + oldUser.getOauthType() +  " 소셜 로그인을 이용해서 해당 이메일로 가입한 적이 있습니다.";
+	    	
+	    	Map<String, Object> map = new HashMap<>();
+	    	map.put("username", oldUser.getUsername());
+	    	map.put("error", error);
+	    
+	    	return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+	    }
 
 	    accessToken = jwtUtil.createJwt(oldUser.getUsername(), oldUser.getRole().toString(), 1000 * 60 * 60L);
         String refreshToken = jwtUtil.generateRefreshToken(oldUser.getUsername(), oldUser.getRole().toString(), 1000 * 60 * 60 * 24 * 7);
@@ -155,6 +167,20 @@ public class KakaoController {
 	            String.class);
 
 	    return response;
+    }
+    
+    @PostMapping("/travelo/integratedKakao")
+    public ResponseEntity<AuthResponse> intergratedKakao(@RequestParam String username) {
+
+    	SiteUser user = userService.getUser(username);
+    	userService.modifyOauth(user, "kakao");
+    	
+    	String accessToken = jwtUtil.createJwt(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60L);
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60 * 24 * 7);
+	    
+        AuthResponse authResponse = new AuthResponse(accessToken, refreshToken);
+
+        return ResponseEntity.ok().body(authResponse);
     }
     
 }

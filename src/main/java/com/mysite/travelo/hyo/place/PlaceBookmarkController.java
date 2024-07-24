@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import com.mysite.travelo.yeon.user.SiteUser;
 import com.mysite.travelo.yeon.user.UserService;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +34,6 @@ import java.util.Map;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/user/placebookmarks")
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173"})
 public class PlaceBookmarkController {
 
 	private final UserService userService;
