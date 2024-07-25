@@ -1,8 +1,11 @@
 package com.mysite.travelo.yeon.oauth;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -42,7 +45,7 @@ public class KakaoController {
 	private String kakaoAdmin;
 	
 	@GetMapping("/travelo/kakaoCallback")
-	public ResponseEntity<?> kakaoCallback(@RequestParam String code) {
+	public ResponseEntity<?> kakaoCallback(@RequestParam String code) throws IOException {
 
 		// RestTemplate 생성
 	    RestTemplate restTemplate = new RestTemplate();
@@ -55,7 +58,7 @@ public class KakaoController {
 	    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 	    params.add("grant_type", "authorization_code");
 	    params.add("client_id", kakaoApi); // Kakao에서 발급한 REST API Key 입력
-	    params.add("redirect_uri", "http://localhost:8080/travelo/kakaoCallback"); // Kakao 개발자 센터에서 설정한 리다이렉트 URI
+	    params.add("redirect_uri", "http://localhost:5173/travelo/kakaoCallback"); // Kakao 개발자 센터에서 설정한 리다이렉트 URI
 	    params.add("code", code);
 
 	    // 헤더 + 바디 결합
@@ -95,7 +98,8 @@ public class KakaoController {
 	    	Map<String, Object> map = new HashMap<>();
 	    	map.put("username", oldUser.getUsername());
 	    	map.put("error", error);
-	    
+
+
 	    	return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
 	    }
 

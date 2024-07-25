@@ -56,7 +56,7 @@ public class NaverController {
 		params.add("client_id", clientId);
 		params.add("client_secret", scecretKey);
 		params.add("code", code);
-		params.add("redirect_uri", "http://localhost:8080/travelo/naverCallback");
+		params.add("redirect_uri", "http://localhost:5173/travelo/naverCallback");
 		params.add("state", "STATE_STRING");
 		
 		 // 헤더 + 바디 결합
