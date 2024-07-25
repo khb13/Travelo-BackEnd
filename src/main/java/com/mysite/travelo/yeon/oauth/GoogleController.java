@@ -163,9 +163,12 @@ public class GoogleController {
 	
 	@PostMapping("/travelo/integratedGoogle")
 	public ResponseEntity<AuthResponse> integratedGoogle(@RequestParam String username) {
-		
 		SiteUser user = userService.getUser(username);
-    	userService.modifyOauth(user, "google");
+
+		Map<String, String> map = new HashMap<>();
+		map.put("oauthType", "google");
+		
+    	userService.modifyOauth(map, user);
     	
     	String accessToken = jwtUtil.createJwt(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60L);
         String refreshToken = jwtUtil.generateRefreshToken(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60 * 24 * 7);

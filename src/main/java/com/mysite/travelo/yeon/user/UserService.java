@@ -154,13 +154,15 @@ public class UserService {
 		loginUser.setPassword(bCryptPasswordEncoder.encode(map.get("password")));
 		loginUser.setTel(map.get("tel"));
 		loginUser.setModifyDate(LocalDateTime.now());
+		loginUser.setOauthId(map.get("oauthId"));
 		
 		userRepository.save(loginUser);
 	}
 	
-	public void modifyOauth(SiteUser user, String oauth) {
+	public void modifyOauth(Map<String, String> map, SiteUser user) {
 		
-		user.setOauthType(oauth);
+		user.setOauthType(map.get("oauthType"));
+		user.setOauthId(map.get("oauthId"));
 		user.setModifyDate(LocalDateTime.now());
 		
 		userRepository.save(user);

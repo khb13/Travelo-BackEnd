@@ -236,7 +236,11 @@ public class NaverController {
 	@PostMapping("/travelo/integratedNaver")
 	public ResponseEntity<AuthResponse> integratedNaver(@RequestParam String username) {
 		SiteUser user = userService.getUser(username);
-    	userService.modifyOauth(user, "naver");
+
+		Map<String, String> map = new HashMap<>();
+		map.put("oauthType", "naver");
+
+		userService.modifyOauth(map, user);
     	
     	String accessToken = jwtUtil.createJwt(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60L);
         String refreshToken = jwtUtil.generateRefreshToken(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60 * 24 * 7);
