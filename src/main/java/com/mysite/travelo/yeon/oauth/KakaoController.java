@@ -53,7 +53,7 @@ public class KakaoController {
 	    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 	    params.add("grant_type", "authorization_code");
 	    params.add("client_id", kakaoApi); // Kakao에서 발급한 REST API Key 입력
-	    params.add("redirect_uri", "http://localhost:8080/travelo/kakaoCallback"); // Kakao 개발자 센터에서 설정한 리다이렉트 URI
+	    params.add("redirect_uri", "http://localhost:5173/travelo/kakaoCallback"); // Kakao 개발자 센터에서 설정한 리다이렉트 URI
 	    params.add("code", code);
 
 	    // 헤더 + 바디 결합
@@ -146,7 +146,7 @@ public class KakaoController {
 	    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 	    params.add("grant_type", "authorization_code");
 	    params.add("client_id", kakaoApi); // Kakao에서 발급한 REST API Key 입력
-	    params.add("redirect_uri", "http://localhost:8080/travelo/integratedKakao"); // Kakao 개발자 센터에서 설정한 리다이렉트 URI
+	    params.add("redirect_uri", "http://localhost:5173/travelo/integratedKakao"); // Kakao 개발자 센터에서 설정한 리다이렉트 URI
 	    params.add("code", code);
 
 	    // 헤더 + 바디 결합
