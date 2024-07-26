@@ -1,6 +1,7 @@
 package com.mysite.travelo.gil.review;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
@@ -15,6 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mysite.travelo.yeon.mail.MailService;
+import com.mysite.travelo.yeon.user.SiteUser;
+import com.mysite.travelo.yeon.user.UserService;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController // JSON 형태로 반환할 것임을 명시
@@ -22,7 +27,9 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/admin")
 public class AdminReviewController {
 	
+	private final UserService userService;
 	private final ReviewService reviewService;
+	private final MailService mailService;
 
 //	블라인드 처리 대기 리뷰 목록(관리자 기능)
 	@PreAuthorize("isAuthenticated()")
@@ -46,6 +53,24 @@ public class AdminReviewController {
 											@PathVariable("reviewSeq") Integer reviewSeq) {
 		
 		reviewService.blindReview(reviewSeq);
+		
+		// 블라인드 5회 이상 강제 탈퇴 + 메일 발송
+		Review review = reviewService.getReview(reviewSeq);
+		
+		SiteUser user = userService.getUser(review.getUser().getUserSeq());
+		List<Review> blindReviews = reviewService.getBlindReview(user);
+		
+		if (blindReviews.size() >= 5) {
+			userService.resign(user);
+			
+			try {
+				mailService.sendResignMessage(user.getUsername());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			return new ResponseEntity<>("블라인드가 확정되어 누적 5회 이상으로 강제 탈퇴되었습니다.", HttpStatus.OK);
+		}
 		
 		return new ResponseEntity<>("블라인드가 확정되었습니다.", HttpStatus.OK);
 	}
