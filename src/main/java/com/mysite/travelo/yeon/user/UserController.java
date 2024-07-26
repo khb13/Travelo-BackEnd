@@ -73,13 +73,19 @@ public class UserController {
         }
 
         userService.joinMail(map);
+        
+        try {
+			mailService.sendJoinMessage(map.get("username"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
         return ResponseEntity.ok("가입 되었습니다");
     }
 	
 	@PostMapping("/travelo/mailConfirm")
 	public ResponseEntity<?> mailConfirm(HttpSession session, @RequestParam(value = "username") String username) throws Exception{
-        String code = mailService.sendSimpleMessage(username);
+        String code = mailService.sendConfirmMessage(username);
         session.setAttribute("username", username);
         session.setAttribute("code", code);
 
