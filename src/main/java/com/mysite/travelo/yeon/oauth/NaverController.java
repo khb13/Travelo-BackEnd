@@ -18,11 +18,13 @@ import org.springframework.util.MultiValueMap;
 import com.mysite.travelo.yeon.user.AuthResponse;
 import com.mysite.travelo.yeon.user.JWTUtil;
 import com.mysite.travelo.yeon.user.SiteUser;
+import com.mysite.travelo.yeon.user.TokenBlacklistService;
 import com.mysite.travelo.yeon.user.UserService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
@@ -33,6 +35,7 @@ public class NaverController {
 
 	private final UserService userService;
 	private final OAuthTokenService oAuthTokenService;
+	private final TokenBlacklistService tokenBlacklistService;
 	private final JWTUtil jwtUtil;
 	
 	@Value("${NAVER_CLIENT_ID}")
@@ -99,6 +102,16 @@ public class NaverController {
         // 사용자 정보로 회원 조회
 	    SiteUser oldUser = userService.getUser(email);
 
+	    if (oldUser != null && oldUser.getDelYn().equals("N") && oldUser.getUsername().equals(email)) {
+	    	String error = "이메일이 중복되어 해당 네이버 계정으로 가입이 불가합니다. 기존에 가입된 이메일 계정(" + email + ")으로 로그인해주세요.";
+	    	
+	    	Map<String, Object> map = new HashMap<>();
+	    	map.put("username", oldUser.getUsername());
+	    	map.put("error", error);
+	    
+	    	return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+	    }
+	    
 	    // 회원이 존재하지 않으면 회원 가입 처리
 	    if (oldUser == null) {
 	        userService.joinNaver(email, tel);
@@ -204,7 +217,7 @@ public class NaverController {
 	
 	// 네이버 연동 해제
 	@GetMapping("/user/naverUnlink")
-	public ResponseEntity<String> naverUnlink(Authentication auth) {
+	public ResponseEntity<String> naverUnlink(Authentication auth, @RequestHeader("Authorization") String accessToken) {
 		
 		SiteUser user = userService.getLoginUserByUsername(auth.getName());
 		OAuthToken token = oAuthTokenService.getToken(user);
@@ -229,6 +242,14 @@ public class NaverController {
 	            String.class);
 	    
 	    oAuthTokenService.deleteToken(user);
+	    
+	    userService.resign(user);
+        
+        if (accessToken.startsWith("Bearer ")) {
+        	accessToken = accessToken.substring(7);
+        }
+        
+        tokenBlacklistService.addToken(accessToken);
 
 	    return response;
 	}

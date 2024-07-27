@@ -128,9 +128,9 @@ public class UserService {
 			return null;
 		}
 		
-		if (findUser.get().getDelYn().equals("Y")) {
-			return null;
-		}
+//		if (findUser.get().getDelYn().equals("Y")) {
+//			return null;
+//		}
 
 		return findUser.get();
 	}

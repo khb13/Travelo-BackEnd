@@ -16,12 +16,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import com.mysite.travelo.yeon.user.AuthResponse;
 import com.mysite.travelo.yeon.user.JWTUtil;
 import com.mysite.travelo.yeon.user.SiteUser;
+import com.mysite.travelo.yeon.user.TokenBlacklistService;
 import com.mysite.travelo.yeon.user.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class KakaoController {
 
 	private final UserService userService;
+	private final TokenBlacklistService tokenBlacklistService;
 	private final JWTUtil jwtUtil;
 	
 	@Value("${KAKAO_API_KEY}")
@@ -78,6 +81,16 @@ public class KakaoController {
 
 	    SiteUser oldUser = userService.getUser(username);
 	    
+	    if (oldUser != null && oldUser.getDelYn().equals("N") && oldUser.getUsername().equals(username)) {
+	    	String error = "이메일이 중복되어 해당 카카오 계정으로 가입이 불가합니다. 기존에 가입된 이메일 계정(" + username + ")으로 로그인해주세요.";
+	    	
+	    	Map<String, Object> map = new HashMap<>();
+	    	map.put("username", oldUser.getUsername());
+	    	map.put("error", error);
+	    
+	    	return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+	    }
+	    
 	    if (oldUser == null) {
 	        userService.joinKakao(username, id);
 	        oldUser = userService.getUser(username);
@@ -106,7 +119,7 @@ public class KakaoController {
 	}
 	
     @GetMapping("/user/kakaoUnlink")
-    public ResponseEntity<String> kakaoUnlink(Authentication auth) {
+    public ResponseEntity<String> kakaoUnlink(Authentication auth, @RequestHeader("Authorization") String accessToken) {
     	
     	SiteUser user = userService.getLoginUserByUsername(auth.getName());
     	String id = user.getOauthId();
@@ -128,6 +141,14 @@ public class KakaoController {
 	            HttpMethod.POST,
 	            kakaoInfo,
 	            String.class);
+	    
+	    userService.resign(user);
+        
+        if (accessToken.startsWith("Bearer ")) {
+        	accessToken = accessToken.substring(7);
+        }
+        
+        tokenBlacklistService.addToken(accessToken);
 
 	    return response;
     }

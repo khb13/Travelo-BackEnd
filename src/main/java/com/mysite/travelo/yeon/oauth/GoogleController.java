@@ -16,12 +16,14 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import com.mysite.travelo.yeon.user.AuthResponse;
 import com.mysite.travelo.yeon.user.JWTUtil;
 import com.mysite.travelo.yeon.user.SiteUser;
+import com.mysite.travelo.yeon.user.TokenBlacklistService;
 import com.mysite.travelo.yeon.user.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class GoogleController {
 
 	private final UserService userService;
 	private final OAuthTokenService oAuthTokenService;
+	private final TokenBlacklistService tokenBlacklistService;
 	private final JWTUtil jwtUtil;
 	
 	@Value("${GOOGLE_CLIENT_ID}")
@@ -55,7 +58,7 @@ public class GoogleController {
 	    params.add("code", code);
 	    params.add("client_id", clientId); 
 	    params.add("client_secret", scecretKey); 
-	    params.add("redirect_uri", "http://localhost:5173/travelo/googleCallback");
+	    params.add("redirect_uri", "http://localhost:8080/travelo/googleCallback");
 	    params.add("grant_type", "authorization_code");
 	    params.add("access_type", "offline"); 
 
@@ -71,7 +74,6 @@ public class GoogleController {
 
 	    // 액세스 토큰
 	    String accessToken = (String) response.getBody().get("access_token");
-	    String refreshToken = (String) response.getBody().get("refresh_token");
 
 	    // 사용자 정보 요청
 	    HttpHeaders headers = new HttpHeaders();
@@ -90,6 +92,16 @@ public class GoogleController {
 	    // 사용자 정보로 회원 조회
 	    SiteUser oldUser = userService.getUser(email);
 
+	    if (oldUser != null && oldUser.getDelYn().equals("N") && oldUser.getUsername().equals(email)) {
+	    	String error = "이메일이 중복되어 해당 계정으로 가입이 불가합니다. 기존에 가입된 이메일 계정(" + email + ")으로 로그인해주세요.";
+	    	
+	    	Map<String, Object> map = new HashMap<>();
+	    	map.put("username", oldUser.getUsername());
+	    	map.put("error", error);
+	    
+	    	return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+	    }
+
 	    // 회원이 존재하지 않으면 회원 가입 처리
 	    if (oldUser == null) {
 	        userService.joinGoogle(email);
@@ -100,7 +112,7 @@ public class GoogleController {
 	    if ("Y".equals(oldUser.getDelYn())) {
 	        return new ResponseEntity<>("탈퇴한 회원입니다", HttpStatus.BAD_REQUEST);
 	    }
-	    
+
 	    if (oldUser.getOauthType() != null && !oldUser.getOauthType().equals("google")) {
 	    	String error = "사용자가 " + oldUser.getOauthType() + " 소셜 로그인을 이용해서 해당 이메일로 가입한 적이 있습니다.";
 	    	
@@ -115,7 +127,6 @@ public class GoogleController {
 	    
 	    Map<String, Object> map = new HashMap<>();
     	map.put("accessToken", accessToken);
-    	map.put("refreshToken", refreshToken);
     	map.put("user", oldUser);
     	
 	    // 토큰이 저장되어 있는 경우 기존 걸 수정
@@ -127,7 +138,7 @@ public class GoogleController {
 
 	    // JWT 토큰 생성 및 반환
 	    String jwtToken = jwtUtil.createJwt(oldUser.getUsername(), oldUser.getRole().toString(), 1000 * 60 * 60L);
-	    refreshToken = jwtUtil.generateRefreshToken(oldUser.getUsername(), oldUser.getRole().toString(), 1000 * 60 * 60 * 24 * 7);
+	    String refreshToken = jwtUtil.generateRefreshToken(oldUser.getUsername(), oldUser.getRole().toString(), 1000 * 60 * 60 * 24 * 7);
 
 	    AuthResponse authResponse = new AuthResponse(jwtToken, refreshToken);
 
@@ -135,7 +146,7 @@ public class GoogleController {
 	}
 	
 	@GetMapping("/user/googleUnlink")
-	public ResponseEntity<String> googleUnlink(Authentication auth) {
+	public ResponseEntity<String> googleUnlink(Authentication auth, @RequestHeader("Authorization") String accessToken) {
 
 		SiteUser user = userService.getLoginUserByUsername(auth.getName());
 		OAuthToken token = oAuthTokenService.getToken(user);
@@ -157,6 +168,14 @@ public class GoogleController {
 	            String.class);
 	    
 	    oAuthTokenService.deleteToken(user);
+	    
+	    userService.resign(user);
+        
+        if (accessToken.startsWith("Bearer ")) {
+        	accessToken = accessToken.substring(7);
+        }
+        
+        tokenBlacklistService.addToken(accessToken);
 
 	    return response;
 	}

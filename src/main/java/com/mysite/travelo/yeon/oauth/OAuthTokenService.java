@@ -20,7 +20,11 @@ public class OAuthTokenService {
 		
 		OAuthToken oAuthToken = new OAuthToken();
 		oAuthToken.setAccessToken((String)map.get("accessToken"));
-		oAuthToken.setRefreshToken((String)map.get("refreshToken"));
+		
+		if (map.get("refresjToken") != null) {
+			oAuthToken.setRefreshToken((String)map.get("refreshToken"));
+		}
+
 		oAuthToken.setUser((SiteUser)map.get("user"));
 		
 		oAuthTokenRepository.save(oAuthToken);
