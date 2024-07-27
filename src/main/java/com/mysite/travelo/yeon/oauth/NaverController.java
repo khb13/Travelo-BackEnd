@@ -101,7 +101,7 @@ public class NaverController {
 	    SiteUser oldUser = userService.getUser(email);
 
 	    if (oldUser != null && oldUser.getDelYn().equals("N") && oldUser.getUsername().equals(email) && oldUser.getOauthType() == null) {
-	    	String error = "이메일이 중복되어 해당 계정으로 가입이 불가합니다. 기존에 가입된 이메일 계정(" + email + ")으로 로그인해주세요.";
+	    	String error = "이메일이 중복되어 해당 social 계정으로 가입이 불가합니다. 기존에 가입된 이메일 계정(" + email + ")으로 로그인해주세요.";
 	    	
 	    	Map<String, Object> map = new HashMap<>();
 	    	map.put("username", oldUser.getUsername());

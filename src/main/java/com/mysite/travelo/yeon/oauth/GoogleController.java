@@ -93,7 +93,7 @@ public class GoogleController {
 	    SiteUser oldUser = userService.getUser(email);
 
 	    if (oldUser != null && oldUser.getDelYn().equals("N") && oldUser.getUsername().equals(email) && oldUser.getOauthType() == null) {
-	    	String error = "이메일이 중복되어 해당 계정으로 가입이 불가합니다. 기존에 가입된 이메일 계정(" + email + ")으로 로그인해주세요.";
+	    	String error = "이메일이 중복되어 해당 social 계정으로 가입이 불가합니다. 기존에 가입된 이메일 계정(" + email + ")으로 로그인해주세요.";
 	    	
 	    	Map<String, Object> map = new HashMap<>();
 	    	map.put("username", oldUser.getUsername());
@@ -183,7 +183,7 @@ public class GoogleController {
 	@GetMapping("/travelo/integratedGoogle")
 	public ResponseEntity<AuthResponse> integratedGoogle(@RequestParam("code") String code) {
 		
-    	// RestTemplate 생성
+		// RestTemplate 생성
 	    RestTemplate restTemplate = new RestTemplate();
 
 	    // 헤더 설정
@@ -211,7 +211,7 @@ public class GoogleController {
 
 	    // 액세스 토큰
 	    String accessToken = (String) response.getBody().get("access_token");
-    	
+
 	    // 사용자 정보 요청
 	    HttpHeaders headers = new HttpHeaders();
 	    headers.setBearerAuth(accessToken);
