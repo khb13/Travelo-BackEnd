@@ -252,7 +252,7 @@ public class NaverController {
 	    return response;
 	}
 	
-	@PostMapping("/travelo/integratedNaver")
+	@GetMapping("/travelo/integratedNaver")
 	public ResponseEntity<AuthResponse> integratedNaver(@RequestParam("code") String code) {
 		
 		// RestTemplate 생성

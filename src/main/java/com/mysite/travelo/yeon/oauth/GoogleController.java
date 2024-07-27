@@ -180,7 +180,7 @@ public class GoogleController {
 	    return response;
 	}
 	
-	@PostMapping("/travelo/integratedGoogle")
+	@GetMapping("/travelo/integratedGoogle")
 	public ResponseEntity<AuthResponse> integratedGoogle(@RequestParam("code") String code) {
 		
     	// RestTemplate 생성
