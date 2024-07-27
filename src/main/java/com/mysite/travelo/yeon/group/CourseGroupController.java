@@ -35,7 +35,6 @@ public class CourseGroupController {
 
 	private final UserService userService;
 	private final CourseGroupService courseGroupService;
-	private final CourseBookmarkService bookmarkService;
 	private final CourseService courseService;
 	private final CourseGroupListService courseGroupListService;
 	
@@ -94,7 +93,7 @@ public class CourseGroupController {
 	}
 	
 	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/delete") 
+	@PostMapping("/deleteGroups") 
 	public ResponseEntity<String> deleteGroups(@RequestBody Map<String, List<Integer>> map) {
 		
 		if (map.get("courseGroupSeqs").size() == 0 ) {
@@ -191,78 +190,6 @@ public class CourseGroupController {
 		}	
 		
 		return new ResponseEntity<>("존재하지 않는 코스를 저장하려고 시도했습니다", HttpStatus.BAD_REQUEST);
-	}
-	
-	@PreAuthorize("isAuthenticated()")
-	@GetMapping("/bookmarks")
-	public ResponseEntity<?> bookmarks(Authentication auth) {
-		
-		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
-		List<CourseBookmark> bookmarks = bookmarkService.getList(loginUser.getUserSeq());
-		
-		if (bookmarks == null) {
-			return new ResponseEntity<>("북마크 한 코스가 없습니다", HttpStatus.NOT_FOUND);
-		}
-		
-		Map<String, Object> response = new HashMap<>();
-        response.put("loginUser", loginUser);
-        response.put("bookmarks", bookmarks);
-        
-		return ResponseEntity.ok(response);
-	}
-	
-	@PreAuthorize("isAuthenticated()")
-	@GetMapping("/bookmarks/{areaCode}")
-	public ResponseEntity<?> bookmarksByArea(Authentication auth, @PathVariable("areaCode") String areaCode) {
-		
-		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
-		List<CourseBookmark> bookmarks = bookmarkService.getListByArea(loginUser.getUserSeq(), areaCode);
-		
-		if (bookmarks == null) {
-			return new ResponseEntity<>("지역 코드 값에 해당하는 북마크가 없습니다", HttpStatus.NOT_FOUND);
-		}
-		
-		Map<String, Object> response = new HashMap<>();
-        response.put("loginUser", loginUser);
-        response.put("bookmarks", bookmarks);
-        
-		return ResponseEntity.ok(response);
-	}
-	
-	@PreAuthorize("isAuthenticated()")
-	@GetMapping("/customCourses")
-	public ResponseEntity<?> customCourses(Authentication auth) {
-		
-		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
-		List<Course> customCourses = courseService.getCustom(loginUser);
-		
-		if (customCourses == null) {
-			return new ResponseEntity<>("커스텀 한 코스가 없습니다", HttpStatus.NOT_FOUND);
-		}
-		
-		Map<String, Object> response = new HashMap<>();
-        response.put("loginUser", loginUser);
-        response.put("customCourses", customCourses);
-        
-		return ResponseEntity.ok(response);
-	}
-	
-	@PreAuthorize("isAuthenticated()")
-	@GetMapping("/customCourses/{areaCode}")
-	public ResponseEntity<?> customCoursesByArea(Authentication auth, @PathVariable("areaCode") String areaCode) {
-		
-		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
-		List<Course> customCourses = courseService.getCustomByArea(loginUser, areaCode);
-		
-		if (customCourses == null) {
-			return new ResponseEntity<>("지역 코드 값에 해당하는 커스텀 코스가 없습니다", HttpStatus.NOT_FOUND);
-		}
-		
-		Map<String, Object> response = new HashMap<>();
-        response.put("loginUser", loginUser);
-        response.put("customCourses", customCourses);
-
-        return ResponseEntity.ok(response);
 	}
 	
 }

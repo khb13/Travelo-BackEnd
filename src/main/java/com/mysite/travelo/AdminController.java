@@ -212,36 +212,6 @@ public class AdminController {
 		return ResponseEntity.ok("삭제 시켰습니다.");
 	}
 	
-	// 코스 삭제 : 여러 개
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/deleteCourses")
-	public ResponseEntity<?> deleteCourses(@RequestBody Map<String, List<Integer>> map) {
-		
-		if (map.get("courseSeqs").size() == 0 ) {
-			return new ResponseEntity<>("삭제 시킬 코스가 없습니다", HttpStatus.BAD_REQUEST);
-		}
-		
-		List<Integer> seqs = map.get("courseSeqs");
-		List<Integer> courseSeqs = new ArrayList<>();
-		
-		for (Integer seq : seqs) {
-			Course course = courseService.getCourse(seq);
-			
-			if (course == null) {
-				return new ResponseEntity<>("존재하지 않는 코스를 삭제 시키려고 시도했습니다.", HttpStatus.NOT_FOUND);
-			}
-			
-			courseSeqs.add(seq);
-		}
-		
-		for (Integer courseSeq : courseSeqs) {
-			Course course = courseService.getCourse(courseSeq);
-			courseService.delete(course);
-		}
-		
-		return ResponseEntity.ok("삭제 시켰습니다.");
-	}
-	
 	// 리뷰 삭제 : 여러 개
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/deleteReviews")

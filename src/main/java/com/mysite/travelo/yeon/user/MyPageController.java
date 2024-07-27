@@ -1,5 +1,8 @@
 package com.mysite.travelo.yeon.user;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -10,26 +13,36 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.servlet.http.HttpSession;
+import com.mysite.travelo.gil.course.Course;
+import com.mysite.travelo.gil.course.CourseBookmark;
+import com.mysite.travelo.gil.course.CourseBookmarkService;
+import com.mysite.travelo.gil.course.CourseService;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/user")
 public class MyPageController {
 	
 	private final UserService userService;
+	private final CourseService courseService;
+	private final CourseBookmarkService bookmarkService;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private final TokenBlacklistService tokenBlacklistService;
 	
 	private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{8,20}$");
 	
 	@PreAuthorize("isAuthenticated()")
-    @GetMapping("/user/mypage")
+    @GetMapping("/mypage")
     public ResponseEntity<?> myPage(Authentication auth) {
     	SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
     	
@@ -37,7 +50,7 @@ public class MyPageController {
     }
     
 	@PreAuthorize("isAuthenticated()")
-    @PostMapping("/user/modify")
+    @PostMapping("/modify")
     public ResponseEntity<String> modify(@RequestParam Map<String, String> map, Authentication auth) {
 		
     	// Null 체크
@@ -71,7 +84,7 @@ public class MyPageController {
     }
 	
 	@PreAuthorize("isAuthenticated()")
-    @PostMapping("/user/resign")
+    @PostMapping("/resign")
     public ResponseEntity<String> resign(@RequestParam Map<String, String> map, Authentication auth, @RequestHeader("Authorization") String accessToken) {
     	
     	// Null 체크
@@ -101,58 +114,106 @@ public class MyPageController {
         return ResponseEntity.ok("성공적으로 탈퇴되었습니다");
     }
     
-    @PostMapping("/travelo/check")
-    public ResponseEntity<String> checkUser(@RequestParam(value = "username") String username, HttpSession session) {
-    	
-    	// Null 체크
-        if (!StringUtils.hasText(username)) {
-            return new ResponseEntity<>("이메일을 입력해주세요", HttpStatus.BAD_REQUEST);
-        }
-    	
-        SiteUser loginUser = userService.getUser(username);
+    @PreAuthorize("isAuthenticated()")
+	@GetMapping("/courseBookmarks")
+	public ResponseEntity<?> bookmarks(Authentication auth) {
+		
+		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+		List<CourseBookmark> bookmarks = bookmarkService.getList(loginUser.getUserSeq());
+		
+		if (bookmarks == null) {
+			return new ResponseEntity<>("북마크 한 코스가 없습니다", HttpStatus.NOT_FOUND);
+		}
+		
+		Map<String, Object> response = new HashMap<>();
+        response.put("loginUser", loginUser);
+        response.put("bookmarks", bookmarks);
         
-        if (loginUser != null) {
+		return ResponseEntity.ok(response);
+	}
+	
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/courseBookmarks/{areaCode}")
+	public ResponseEntity<?> bookmarksByArea(Authentication auth, @PathVariable("areaCode") String areaCode) {
+		
+		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+		List<CourseBookmark> bookmarks = bookmarkService.getListByArea(loginUser.getUserSeq(), areaCode);
+		
+		if (bookmarks == null) {
+			return new ResponseEntity<>("지역 코드 값에 해당하는 북마크가 없습니다", HttpStatus.NOT_FOUND);
+		}
+		
+		Map<String, Object> response = new HashMap<>();
+        response.put("loginUser", loginUser);
+        response.put("bookmarks", bookmarks);
+        
+		return ResponseEntity.ok(response);
+	}
+	
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/customCourses")
+	public ResponseEntity<?> customCourses(Authentication auth) {
+		
+		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+		List<Course> customCourses = courseService.getCustom(loginUser);
+		
+		if (customCourses == null) {
+			return new ResponseEntity<>("커스텀 한 코스가 없습니다", HttpStatus.NOT_FOUND);
+		}
+		
+		Map<String, Object> response = new HashMap<>();
+        response.put("loginUser", loginUser);
+        response.put("customCourses", customCourses);
+        
+		return ResponseEntity.ok(response);
+	}
+	
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/customCourses/{areaCode}")
+	public ResponseEntity<?> customCoursesByArea(Authentication auth, @PathVariable("areaCode") String areaCode) {
+		
+		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
+		List<Course> customCourses = courseService.getCustomByArea(loginUser, areaCode);
+		
+		if (customCourses == null) {
+			return new ResponseEntity<>("지역 코드 값에 해당하는 커스텀 코스가 없습니다", HttpStatus.NOT_FOUND);
+		}
+		
+		Map<String, Object> response = new HashMap<>();
+        response.put("loginUser", loginUser);
+        response.put("customCourses", customCourses);
 
-        	session.setAttribute("username", loginUser.getUsername());
-        	return ResponseEntity.ok("유효한 이메일입니다");
-        }
-        
-        return new ResponseEntity<>("해당하는 정보가 없습니다", HttpStatus.NOT_FOUND);
-    }
+        return ResponseEntity.ok(response);
+	}
     
-    @PostMapping("/travelo/resetPassword")
-    public ResponseEntity<String> resetPassword(@RequestParam Map<String, String> map, HttpSession session) {
-        
-    	// Null 체크
-        if (!StringUtils.hasText(map.get("password")) || !StringUtils.hasText(map.get("passwordCheck"))) {
-        	return new ResponseEntity<>("모든 필드를 채워주세요", HttpStatus.BAD_REQUEST);
-        }
-    	
-        String username = (String)session.getAttribute("username");
-    	SiteUser loginUser = userService.getUser(username);
-    	
-    	if (username == null) {
-            return new ResponseEntity<>("세션이 만료되었습니다. 다시 시도해주세요.", HttpStatus.UNAUTHORIZED);
-        }
-    	
-    	// 비밀번호 형식 체크
-        if (!PASSWORD_PATTERN.matcher(map.get("password")).matches()) {
-        	return new ResponseEntity<>("비밀번호는 소문자 영문과 숫자를 포함하여 8자 이상 20자 이하여야 합니다", HttpStatus.BAD_REQUEST);
-        }
-    	
-    	// 비밀번호 = 비밀번호 체크 여부 확인
-        if (!map.get("password").equals(map.get("passwordCheck"))) {
-        	return new ResponseEntity<>("비밀번호가 일치하지 않습니다", HttpStatus.BAD_REQUEST);
-        }
-        
-        if (bCryptPasswordEncoder.matches(map.get("password"), loginUser.getPassword())) {
-        	return new ResponseEntity<>("기존 비밀번호는 사용할 수 없습니다", HttpStatus.BAD_REQUEST);
-        }
-        
-    	userService.resetPassword(map, loginUser);
-    	session.invalidate();
-    	
-    	return ResponseEntity.ok("비밀번호 변경되었습니다");
-    }
-    
+	// 코스 삭제 : 여러 개
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/deleteCourses")
+	public ResponseEntity<?> deleteCourses(@RequestBody Map<String, List<Integer>> map) {
+		
+		if (map.get("courseSeqs").size() == 0 ) {
+			return new ResponseEntity<>("삭제 시킬 코스가 없습니다", HttpStatus.BAD_REQUEST);
+		}
+		
+		List<Integer> seqs = map.get("courseSeqs");
+		List<Integer> courseSeqs = new ArrayList<>();
+		
+		for (Integer seq : seqs) {
+			Course course = courseService.getCourse(seq);
+			
+			if (course == null) {
+				return new ResponseEntity<>("존재하지 않는 코스를 삭제 시키려고 시도했습니다.", HttpStatus.NOT_FOUND);
+			}
+			
+			courseSeqs.add(seq);
+		}
+		
+		for (Integer courseSeq : courseSeqs) {
+			Course course = courseService.getCourse(courseSeq);
+			courseService.delete(course);
+		}
+		
+		return ResponseEntity.ok("삭제 시켰습니다.");
+	}
+		
 }

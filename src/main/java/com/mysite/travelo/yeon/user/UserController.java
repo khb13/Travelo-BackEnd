@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,10 +30,11 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
 	private final UserService userService;
-	private final JWTUtil jwtUtil;
-	private final TokenBlacklistService tokenBlacklistService;
 	private final ReviewService reviewService;
+	private final JWTUtil jwtUtil;
 	private final MailService mailService;
+	private final TokenBlacklistService tokenBlacklistService;
+	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	private static final Pattern EMAIL_PATTERN = Pattern.compile("^[\\w\\.-]+@[\\w\\.-]+\\.[a-z]{2,}$", Pattern.CASE_INSENSITIVE);
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{8,20}$");
@@ -170,6 +172,60 @@ public class UserController {
         tokenBlacklistService.addToken(accessToken);
         
         return ResponseEntity.ok("로그아웃 되었습니다");
+    }
+	
+	@PostMapping("/travelo/check")
+    public ResponseEntity<String> checkUser(@RequestParam(value = "username") String username, HttpSession session) {
+    	
+    	// Null 체크
+        if (!StringUtils.hasText(username)) {
+            return new ResponseEntity<>("이메일을 입력해주세요", HttpStatus.BAD_REQUEST);
+        }
+    	
+        SiteUser loginUser = userService.getUser(username);
+        
+        if (loginUser != null) {
+
+        	session.setAttribute("username", loginUser.getUsername());
+        	return ResponseEntity.ok("유효한 이메일입니다");
+        }
+        
+        return new ResponseEntity<>("해당하는 정보가 없습니다", HttpStatus.NOT_FOUND);
+    }
+    
+    @PostMapping("/travelo/resetPassword")
+    public ResponseEntity<String> resetPassword(@RequestParam Map<String, String> map, HttpSession session) {
+        
+    	// Null 체크
+        if (!StringUtils.hasText(map.get("password")) || !StringUtils.hasText(map.get("passwordCheck"))) {
+        	return new ResponseEntity<>("모든 필드를 채워주세요", HttpStatus.BAD_REQUEST);
+        }
+    	
+        String username = (String)session.getAttribute("username");
+    	SiteUser loginUser = userService.getUser(username);
+    	
+    	if (username == null) {
+            return new ResponseEntity<>("세션이 만료되었습니다. 다시 시도해주세요.", HttpStatus.UNAUTHORIZED);
+        }
+    	
+    	// 비밀번호 형식 체크
+        if (!PASSWORD_PATTERN.matcher(map.get("password")).matches()) {
+        	return new ResponseEntity<>("비밀번호는 소문자 영문과 숫자를 포함하여 8자 이상 20자 이하여야 합니다", HttpStatus.BAD_REQUEST);
+        }
+    	
+    	// 비밀번호 = 비밀번호 체크 여부 확인
+        if (!map.get("password").equals(map.get("passwordCheck"))) {
+        	return new ResponseEntity<>("비밀번호가 일치하지 않습니다", HttpStatus.BAD_REQUEST);
+        }
+        
+        if (bCryptPasswordEncoder.matches(map.get("password"), loginUser.getPassword())) {
+        	return new ResponseEntity<>("기존 비밀번호는 사용할 수 없습니다", HttpStatus.BAD_REQUEST);
+        }
+        
+    	userService.resetPassword(map, loginUser);
+    	session.invalidate();
+    	
+    	return ResponseEntity.ok("비밀번호 변경되었습니다");
     }
 	
 }
