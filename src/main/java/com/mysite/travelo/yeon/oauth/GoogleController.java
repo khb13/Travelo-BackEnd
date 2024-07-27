@@ -195,7 +195,7 @@ public class GoogleController {
 	    params.add("code", code);
 	    params.add("client_id", clientId); 
 	    params.add("client_secret", scecretKey); 
-	    params.add("redirect_uri", "http://localhost:5173/travelo/googleCallback");
+	    params.add("redirect_uri", "http://localhost:5173/travelo/integratedGoogle");
 	    params.add("grant_type", "authorization_code");
 	    params.add("access_type", "offline"); 
 
