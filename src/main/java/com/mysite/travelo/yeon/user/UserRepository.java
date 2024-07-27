@@ -1,5 +1,6 @@
 package com.mysite.travelo.yeon.user;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -22,5 +23,7 @@ public interface UserRepository extends JpaRepository<SiteUser, Integer> {
 	
 	// 탈퇴 여부에 따른 회원 목록
 	Page<SiteUser> findByRoleAndDelYn(Pageable pageable, UserRole role, String delYn);
+	
+	List<SiteUser> findByDelYn(String delYn);
 	
 }

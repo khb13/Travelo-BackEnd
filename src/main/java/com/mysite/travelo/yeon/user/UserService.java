@@ -215,7 +215,8 @@ public class UserService {
 	
 	public List<SiteUser> getAllUsersCount() {
 		
-		return userRepository.findAll();
+//		return userRepository.findAll();
+		return userRepository.findByDelYn("N");
 	}
 	
 }
