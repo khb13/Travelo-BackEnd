@@ -265,7 +265,7 @@ public class ReviewService {
 		return reviewRepository.findByReportCountGreaterThanEqual(5);
 	}
 	
-	public Page<Review> getAllReview(int page, String sortBy) {
+	public Page<Map<String, Object>> getAllReview(int page, String sortBy) {
 		
 		Pageable pageable = PageRequest.of(page, 15);
 		
@@ -277,7 +277,15 @@ public class ReviewService {
 			pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순(디폴트)
 		}
 		
-		return reviewRepository.findAll(pageable);
+		Page<Review> reviews = reviewRepository.findAll(pageable);
+		
+		return reviews.map(review -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("review", review);
+            map.put("courseSeq", review.getCourse().getCourseSeq());
+            map.put("courseTitle", review.getCourse().getTitle());
+            return map;
+        });
 	}
 	
 	public Page<Review> getBlindReviews(int page, String blindYn, String sortBy) {

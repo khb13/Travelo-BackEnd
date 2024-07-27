@@ -118,7 +118,7 @@ public class AdminController {
 	public ResponseEntity<?> adminReviews(@RequestParam(defaultValue = "0") int page, 
 			@RequestParam(value = "sortBy", defaultValue = "latest") String sortBy) {
 	
-		Page<Review> reviews = reviewService.getAllReview(page, sortBy);
+		Page<Map<String, Object>> reviews = reviewService.getAllReview(page, sortBy);
 		
 		if (reviews == null) {
 			return new ResponseEntity<>("후기가 없습니다", HttpStatus.NOT_FOUND);
