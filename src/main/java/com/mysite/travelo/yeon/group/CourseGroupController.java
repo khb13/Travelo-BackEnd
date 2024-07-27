@@ -22,6 +22,7 @@ import com.mysite.travelo.yeon.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +91,35 @@ public class CourseGroupController {
 		courseGroupService.delete(courseGroup);
 		
 		return ResponseEntity.ok("그룹 삭제되었습니다");
+	}
+	
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/delete") 
+	public ResponseEntity<String> deleteGroups(@RequestBody Map<String, List<Integer>> map) {
+		
+		if (map.get("courseGroupSeqs").size() == 0 ) {
+			return new ResponseEntity<>("삭제할 코스 그룹이 없습니다", HttpStatus.BAD_REQUEST);
+		}
+		
+		List<Integer> seqs = map.get("courseGroupSeqs");
+		List<Integer> groupSeqs = new ArrayList<>();
+		
+		for (Integer seq : seqs) {
+			CourseGroup group = courseGroupService.getCourse(seq);
+			
+			if (group == null) {
+				return new ResponseEntity<>("존재하지 않는 그룹을 삭제 시키려고 시도했습니다.", HttpStatus.NOT_FOUND);
+			}
+			
+			groupSeqs.add(seq);
+		}
+		
+		for (Integer groupSeq : groupSeqs) {
+			CourseGroup group = courseGroupService.getCourse(groupSeq);
+			courseGroupService.delete(group);
+		}
+		
+	    return ResponseEntity.ok("그룹 삭제되었습니다");
 	}
 	
 	@PreAuthorize("isAuthenticated()")

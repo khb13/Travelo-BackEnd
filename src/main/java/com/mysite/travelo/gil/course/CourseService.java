@@ -229,4 +229,8 @@ public class CourseService {
 		return courseRepository.findByAuthor(author, pageable);
 	}
 
+	public void delete(Course course) {
+		this.courseRepository.delete(course);
+	}
+
 }

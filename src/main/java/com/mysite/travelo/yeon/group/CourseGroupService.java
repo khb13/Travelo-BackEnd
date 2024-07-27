@@ -113,5 +113,5 @@ public class CourseGroupService {
 		
 		return courseGroupRepository.findByAuthorUsername(username, pageable);
 	}
-	
+
 }

@@ -257,7 +257,7 @@ public class ReviewService {
 	
 	public List<Review> getAllReviewCount() {
 		
-		return reviewRepository.findAll(); 
+		return reviewRepository.findByBlindYn("N");
 	}
 
 	public List<Review> getReportReviewCount() {

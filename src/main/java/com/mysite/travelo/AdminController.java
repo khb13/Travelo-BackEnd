@@ -1,5 +1,6 @@
 package com.mysite.travelo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -41,7 +44,7 @@ public class AdminController {
 		
 		Map<String, Object> response = new HashMap<>(); 
 		
-		// 전체 회원 수
+		// 전체 회원 수(탈퇴 회원 제외)
 		List<SiteUser> users = userService.getAllUsersCount();
 		response.put("user count", users.size());
 		
@@ -49,7 +52,7 @@ public class AdminController {
 		List<Course> courses = courseService.getAllCourseCount();
 		response.put("course count", courses.size());
 		
-		// 전체 후기 개수
+		// 전체 후기 개수(블라인드 후기 제외)
 		List<Review> reviews = reviewService.getAllReviewCount();
 		response.put("review count", reviews.size());
 		
@@ -113,6 +116,7 @@ public class AdminController {
 		return ResponseEntity.ok(courses);
 	}
 	
+	// 전체 후기
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/reviews")
 	public ResponseEntity<?> adminReviews(@RequestParam(defaultValue = "0") int page, 
@@ -127,6 +131,7 @@ public class AdminController {
 		return ResponseEntity.ok(reviews);
 	}
 	
+	// blind 여부에 따른 후기
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/getBlindReviews")
 	public ResponseEntity<?> getBlindReviews(@RequestParam(defaultValue = "0") int page,
@@ -142,6 +147,7 @@ public class AdminController {
 		return ResponseEntity.ok(reviews);
 	}
 	
+	// 회원 별 후기 목록
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/reviews/{userSeq}")
 	public ResponseEntity<?> adminReviewsByUser(@PathVariable("userSeq") Integer userSeq, 
@@ -157,6 +163,7 @@ public class AdminController {
 		return ResponseEntity.ok(reviews);
 	}
 	
+	// 전체 그룹 목록
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/groups")
 	public ResponseEntity<?> adminGroups(@RequestParam(defaultValue = "0") int page, 
@@ -171,6 +178,7 @@ public class AdminController {
 		return ResponseEntity.ok(groups);
 	}
 	
+	// 회원 별 그룹 목록
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/groups/{userSeq}")
 	public ResponseEntity<?> adminGroupsByUser(@PathVariable("userSeq") Integer userSeq,
@@ -186,6 +194,82 @@ public class AdminController {
 		}
 		
 		return ResponseEntity.ok(groups);
+	}
+	
+	// 코스 삭제 : 1개
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/deleteCourse/{courseSeq}")
+	public ResponseEntity<?> deleteCourse(@PathVariable("courseSeq") Integer courseSeq) {
+		
+		Course course = courseService.getCourse(courseSeq);
+		
+		if (course == null) {
+			return new ResponseEntity<>("courseSeq에 해당하는 코스가 없습니다.", HttpStatus.NOT_FOUND);
+		}
+		
+		courseService.delete(course);
+		
+		return ResponseEntity.ok("삭제 시켰습니다.");
+	}
+	
+	// 코스 삭제 : 여러 개
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/deleteCourses")
+	public ResponseEntity<?> deleteCourses(@RequestBody Map<String, List<Integer>> map) {
+		
+		if (map.get("courseSeqs").size() == 0 ) {
+			return new ResponseEntity<>("삭제 시킬 코스가 없습니다", HttpStatus.BAD_REQUEST);
+		}
+		
+		List<Integer> seqs = map.get("courseSeqs");
+		List<Integer> courseSeqs = new ArrayList<>();
+		
+		for (Integer seq : seqs) {
+			Course course = courseService.getCourse(seq);
+			
+			if (course == null) {
+				return new ResponseEntity<>("존재하지 않는 코스를 삭제 시키려고 시도했습니다.", HttpStatus.NOT_FOUND);
+			}
+			
+			courseSeqs.add(seq);
+		}
+		
+		for (Integer courseSeq : courseSeqs) {
+			Course course = courseService.getCourse(courseSeq);
+			courseService.delete(course);
+		}
+		
+		return ResponseEntity.ok("삭제 시켰습니다.");
+	}
+	
+	// 리뷰 삭제 : 여러 개
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping("/deleteReviews")
+	public ResponseEntity<?> deleteReviews(@RequestBody Map<String, List<Integer>> map) {
+		
+		if (map.get("reviewSeqs").size() == 0 ) {
+			return new ResponseEntity<>("삭제 시킬 후기가 없습니다", HttpStatus.BAD_REQUEST);
+		}
+		
+		List<Integer> seqs = map.get("reviewSeqs");
+		List<Integer> reviewSeqs = new ArrayList<>();
+		
+		for (Integer seq : seqs) {
+			Review review = reviewService.getReview(seq);
+			
+			if (review == null) {
+				return new ResponseEntity<>("존재하지 않는 후기를 삭제 시키려고 시도했습니다.", HttpStatus.NOT_FOUND);
+			}
+			
+			reviewSeqs.add(seq);
+		}
+		
+		for (Integer reviewSeq : reviewSeqs) {
+			Review review = reviewService.getReview(reviewSeq);
+			reviewService.delete(review);
+		}
+		
+		return ResponseEntity.ok("삭제 시켰습니다.");
 	}
 	
 }
