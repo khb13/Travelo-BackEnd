@@ -76,8 +76,6 @@ public class NaverController {
 	    String accessToken = (String) response.getBody().get("access_token");
 	    String refreshToken = (String) response.getBody().get("refresh_token");
 
-	    System.out.println(accessToken);
-	    
 	    // 사용자 정보 요청
 	    HttpHeaders headers2 = new HttpHeaders();
 	    headers2.add("Authorization", "Bearer "+ accessToken);
@@ -255,16 +253,79 @@ public class NaverController {
 	}
 	
 	@PostMapping("/travelo/integratedNaver")
-	public ResponseEntity<AuthResponse> integratedNaver(@RequestParam String username) {
-		SiteUser user = userService.getUser(username);
+	public ResponseEntity<AuthResponse> integratedNaver(@RequestParam("code") String code) {
+		
+		// RestTemplate 생성
+	    RestTemplate restTemplate = new RestTemplate();
+
+	    // 헤더 설정
+	    HttpHeaders headers1 = new HttpHeaders();
+	    headers1.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+		
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add("grant_type", "authorization_code");
+		params.add("client_id", clientId);
+		params.add("client_secret", scecretKey);
+		params.add("code", code);
+		params.add("redirect_uri", "http://localhost:5173/travelo/naverCallback");
+		params.add("state", "STATE_STRING");
+		
+		 // 헤더 + 바디 결합
+	    HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers1);
+		
+		// OAuth 토큰 요청
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+        		"https://nid.naver.com/oauth2.0/token",
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<Map<String, Object>>() {});
+
+	    // 액세스 토큰
+	    String accessToken = (String) response.getBody().get("access_token");
+	    String refreshToken = (String) response.getBody().get("refresh_token");
+		
+	    // 사용자 정보 요청
+	    HttpHeaders headers2 = new HttpHeaders();
+	    headers2.add("Authorization", "Bearer "+ accessToken);
+	    headers2.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+	    HttpEntity<MultiValueMap<String, String>> naverInfo
+	        = new HttpEntity<>(headers2);
+
+	    ResponseEntity<Map<String, Object>> userInfoResponse = restTemplate.exchange(
+	            "https://openapi.naver.com/v1/nid/me",
+	            HttpMethod.POST,
+	            naverInfo,
+	            new ParameterizedTypeReference<Map<String, Object>>() {});
+
+	    
+	    Map<String, Object> responseBody = userInfoResponse.getBody();
+	    Map<String, Object> response2 = (Map<String, Object>) responseBody.get("response");
+	    
+	    String username = (String) response2.get("email");
+	    
+	    SiteUser user = userService.getUser(username);
 
 		Map<String, String> map = new HashMap<>();
 		map.put("oauthType", "naver");
 
 		userService.modifyOauth(map, user);
+	    
+		OAuthToken oAuthToken = oAuthTokenService.getToken(user);
+		
+	    Map<String, Object> token = new HashMap<>();
+	    token.put("accessToken", accessToken);
+	    token.put("refreshToken", refreshToken);
+	    token.put("user", user);
     	
-    	String accessToken = jwtUtil.createJwt(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60L);
-        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60 * 24 * 7);
+	    // 토큰이 저장되어 있는 경우 기존 걸 수정
+	    if (oAuthToken != null) {
+	    	oAuthTokenService.modifyToken(token);
+	    } else {
+	    	oAuthTokenService.saveToken(token);
+	    }
+	    
+    	accessToken = jwtUtil.createJwt(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60L);
+        refreshToken = jwtUtil.generateRefreshToken(user.getUsername(), user.getRole().toString(), 1000 * 60 * 60 * 24 * 7);
 	    
         AuthResponse authResponse = new AuthResponse(accessToken, refreshToken);
 
