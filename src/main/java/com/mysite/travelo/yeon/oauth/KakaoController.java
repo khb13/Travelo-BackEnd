@@ -81,7 +81,7 @@ public class KakaoController {
 
 	    SiteUser oldUser = userService.getUser(username);
 	    
-	    if (oldUser != null && oldUser.getDelYn().equals("N") && oldUser.getUsername().equals(username)) {
+	    if (oldUser != null && oldUser.getDelYn().equals("N") && oldUser.getUsername().equals(username) && oldUser.getOauthType() == null) {
 	    	String error = "이메일이 중복되어 해당 계정으로 가입이 불가합니다. 기존에 가입된 이메일 계정(" + username + ")으로 로그인해주세요.";
 	    	
 	    	Map<String, Object> map = new HashMap<>();
@@ -91,13 +91,14 @@ public class KakaoController {
 	    	return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
 	    }
 	    
+	    // 탈퇴한 회원인 경우 처리
+	    if (oldUser != null && "Y".equals(oldUser.getDelYn())) {
+	        return new ResponseEntity<>("탈퇴한 회원입니다", HttpStatus.BAD_REQUEST);
+	    }
+	    
 	    if (oldUser == null) {
 	        userService.joinKakao(username, id);
 	        oldUser = userService.getUser(username);
-	    }
-	    
-	    if (oldUser.getDelYn().equals("Y")) {
-	    	return new ResponseEntity<>("탈퇴한 회원입니다", HttpStatus.BAD_REQUEST);
 	    }
 	    
 	    if (oldUser.getOauthType() != null && !oldUser.getOauthType().equals("kakao")) {

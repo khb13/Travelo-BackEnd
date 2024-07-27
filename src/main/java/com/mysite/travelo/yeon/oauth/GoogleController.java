@@ -92,7 +92,7 @@ public class GoogleController {
 	    // 사용자 정보로 회원 조회
 	    SiteUser oldUser = userService.getUser(email);
 
-	    if (oldUser != null && oldUser.getDelYn().equals("N") && oldUser.getUsername().equals(email)) {
+	    if (oldUser != null && oldUser.getDelYn().equals("N") && oldUser.getUsername().equals(email) && oldUser.getOauthType() == null) {
 	    	String error = "이메일이 중복되어 해당 계정으로 가입이 불가합니다. 기존에 가입된 이메일 계정(" + email + ")으로 로그인해주세요.";
 	    	
 	    	Map<String, Object> map = new HashMap<>();
@@ -102,15 +102,15 @@ public class GoogleController {
 	    	return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
 	    }
 
+	    // 탈퇴한 회원인 경우 처리
+	    if (oldUser != null && "Y".equals(oldUser.getDelYn())) {
+	        return new ResponseEntity<>("탈퇴한 회원입니다", HttpStatus.BAD_REQUEST);
+	    }
+	    
 	    // 회원이 존재하지 않으면 회원 가입 처리
 	    if (oldUser == null) {
 	        userService.joinGoogle(email);
 	        oldUser = userService.getUser(email);
-	    }
-
-	    // 탈퇴한 회원인 경우 처리
-	    if ("Y".equals(oldUser.getDelYn())) {
-	        return new ResponseEntity<>("탈퇴한 회원입니다", HttpStatus.BAD_REQUEST);
 	    }
 
 	    if (oldUser.getOauthType() != null && !oldUser.getOauthType().equals("google")) {
