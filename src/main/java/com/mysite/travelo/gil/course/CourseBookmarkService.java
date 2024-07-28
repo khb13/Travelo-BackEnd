@@ -8,6 +8,7 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 
 import com.mysite.travelo.DataNotFoundException;
+import com.mysite.travelo.gil.review.ReviewReport;
 import com.mysite.travelo.yeon.user.SiteUser;
 import com.mysite.travelo.yeon.user.UserRepository;
 
@@ -22,7 +23,7 @@ public class CourseBookmarkService {
 	private final CourseBookmarkRepository courseBookmarkRepository;
 
 //	코스 북마크에 코스 추가
-	public void addBookmark(Integer userSeq, Integer courseSeq) {
+	public String addBookmark(Integer userSeq, Integer courseSeq) {
 		
 		Optional<SiteUser> ou = userRepository.findById(userSeq);
 		SiteUser user;
@@ -40,11 +41,19 @@ public class CourseBookmarkService {
             throw new DataNotFoundException("코스를 찾을 수 없습니다.");
         }
 
-        if (!courseBookmarkRepository.existsByUserAndCourse(user, course)) {
-            CourseBookmark courseBookmark = new CourseBookmark();
+     // 북마크가 존재하는지 확인
+        boolean cb = courseBookmarkRepository.existsByUserAndCourse(user, course);
+        
+        if (cb) {
+            return "이미 북마크한 코스입니다.";
+        } else {
+            // 북마크가 존재하지 않을 경우 새로 추가
+        	CourseBookmark courseBookmark = new CourseBookmark();
             courseBookmark.setUser(user);
             courseBookmark.setCourse(course);
             courseBookmarkRepository.save(courseBookmark);
+
+            return "북마크가 추가되었습니다.";
         }
 	}
 	

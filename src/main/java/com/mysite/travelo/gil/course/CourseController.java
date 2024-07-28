@@ -105,12 +105,11 @@ public class CourseController {
 	@PostMapping("/bookmark/{courseSeq}")
 	public ResponseEntity<String> bookmark(Authentication auth,
 							@PathVariable("courseSeq") Integer courseSeq) {
-		
 		SiteUser loginUser = userService.getLoginUserByUsername(auth.getName());
 		
-		courseBookmarkService.addBookmark(loginUser.getUserSeq(), courseSeq);
+		String response = courseBookmarkService.addBookmark(loginUser.getUserSeq(), courseSeq);
 		
-		return new ResponseEntity<>("북마크가 추가되었습니다.", HttpStatus.OK);
+		return ResponseEntity.ok(response);
 	}
 	
 //	코스 북마크에 북마크된 코스 삭제
