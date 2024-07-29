@@ -29,13 +29,13 @@ public class CourseService {
 		
 //		정렬
         if ("popularity".equals(sortBy)) {
-            pageable = PageRequest.of(page, 14, Sort.by(Sort.Direction.DESC, "likeCount").and(Sort.by(Sort.Direction.DESC, "viewCount"))); // 좋아요, 조회수 많은순
+            pageable = PageRequest.of(page, 8, Sort.by(Sort.Direction.DESC, "likeCount").and(Sort.by(Sort.Direction.DESC, "viewCount"))); // 좋아요, 조회수 많은순
         } else if ("latest".equals(sortBy)) {
-        	pageable = PageRequest.of(page, 14, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순
+        	pageable = PageRequest.of(page, 8, Sort.by(Sort.Direction.DESC, "createDate")); // 최신순
         } else if ("oldest".equals(sortBy)) {
-        	pageable = PageRequest.of(page, 14, Sort.by(Sort.Direction.ASC, "createDate")); // 오래된순
+        	pageable = PageRequest.of(page, 8, Sort.by(Sort.Direction.ASC, "createDate")); // 오래된순
         } else {
-        	pageable = PageRequest.of(page, 14, Sort.by(Sort.Direction.DESC, "likeCount").and(Sort.by(Sort.Direction.DESC, "viewCount"))); // 좋아요, 조회수 많은순(디폴트)
+        	pageable = PageRequest.of(page, 8, Sort.by(Sort.Direction.DESC, "likeCount").and(Sort.by(Sort.Direction.DESC, "viewCount"))); // 좋아요, 조회수 많은순(디폴트)
         }
         
 //      코스 목록
