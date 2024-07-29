@@ -10,4 +10,5 @@ public interface CourseGroupRepository extends JpaRepository<CourseGroup, Intege
 
 	List<CourseGroup> findByAuthorUsername(String username);
 	Page<CourseGroup> findByAuthorUsername(String username, Pageable pageable);
+	
 }
