@@ -124,6 +124,16 @@ public class ReviewService {
 		}
 	}
 	
+	public Review selectReview(Integer reviewSeq) {
+		Optional<Review> or = this.reviewRepository.findById(reviewSeq);
+		
+		if(or.isPresent()) {
+			return or.get();
+		} else {
+			return null;
+		}
+	}
+	
 //	댓글 수정
 	public void modify(Review review, String content) {
 		review.setContent(content);

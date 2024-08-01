@@ -24,7 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mysite.travelo.gil.course.Course;
 import com.mysite.travelo.gil.course.CourseBookmark;
 import com.mysite.travelo.gil.course.CourseBookmarkService;
+import com.mysite.travelo.gil.course.CourseLikeService;
 import com.mysite.travelo.gil.course.CourseService;
+import com.mysite.travelo.yeon.group.CourseGroupListService;
+import com.mysite.travelo.yeon.group.CourseGroupService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +38,9 @@ public class MyPageController {
 	
 	private final UserService userService;
 	private final CourseService courseService;
+	private final CourseLikeService courseLikeService;
+	private final CourseBookmarkService courseBookmarkService;
+	private final CourseGroupListService courseGroupListService;
 	private final CourseBookmarkService bookmarkService;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private final TokenBlacklistService tokenBlacklistService;
@@ -210,6 +216,10 @@ public class MyPageController {
 		
 		for (Integer courseSeq : courseSeqs) {
 			Course course = courseService.getCourse(courseSeq);
+			
+			courseLikeService.delete(course);
+			courseBookmarkService.delete(course);
+			courseGroupListService.delete(course);
 			courseService.delete(course);
 		}
 		

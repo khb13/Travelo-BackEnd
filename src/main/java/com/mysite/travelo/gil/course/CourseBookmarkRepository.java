@@ -17,4 +17,7 @@ public interface CourseBookmarkRepository extends JpaRepository<CourseBookmark, 
 	
 	List<CourseBookmark> findByUser(SiteUser user);
 	List<CourseBookmark> findByUserAndCourse_AreaCode(SiteUser user, String areaCode);
+	
+	List<CourseBookmark> findByCourse(Course course);
+	
 }

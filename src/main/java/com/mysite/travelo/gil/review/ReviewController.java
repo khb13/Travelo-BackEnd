@@ -31,6 +31,8 @@ public class ReviewController {
 	private final UserService userService;
 	private final CourseService courseService;
 	private final ReviewService reviewService;
+	private final ReviewReportService reviewReportService;
+	private final ReviewRecommendService reviewRecommendService;
 
 //	댓글 작성
 	@PreAuthorize("isAuthenticated()")
@@ -90,6 +92,8 @@ public class ReviewController {
 		
 		Review review = reviewService.getReview(reviewSeq);
 		
+		reviewRecommendService.delete(review);
+		reviewReportService.delete(review);
 		reviewService.delete(review);
 		
 		return new ResponseEntity<>("댓글이 삭제되었습니다.", HttpStatus.OK);
@@ -120,6 +124,5 @@ public class ReviewController {
 		
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
-	
 	
 }

@@ -18,10 +18,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.mysite.travelo.gil.course.Course;
+import com.mysite.travelo.gil.course.CourseBookmarkService;
+import com.mysite.travelo.gil.course.CourseLikeService;
 import com.mysite.travelo.gil.course.CourseService;
 import com.mysite.travelo.gil.review.Review;
+import com.mysite.travelo.gil.review.ReviewRecommendService;
+import com.mysite.travelo.gil.review.ReviewReportService;
 import com.mysite.travelo.gil.review.ReviewService;
 import com.mysite.travelo.yeon.group.CourseGroup;
+import com.mysite.travelo.yeon.group.CourseGroupListService;
 import com.mysite.travelo.yeon.group.CourseGroupService;
 import com.mysite.travelo.yeon.user.SiteUser;
 import com.mysite.travelo.yeon.user.UserService;
@@ -35,8 +40,13 @@ public class AdminController {
 
 	private final UserService userService;
 	private final CourseService courseService;
-	private final ReviewService reviewService;
+	private final CourseLikeService courseLikeService;
+	private final CourseBookmarkService courseBookmarkService;
 	private final CourseGroupService courseGroupService;
+	private final CourseGroupListService courseGroupListService;
+	private final ReviewService reviewService;
+	private final ReviewReportService reviewReportService;
+	private final ReviewRecommendService reviewRecommendService;
 	
 	@PreAuthorize("isAuthenticated()")
     @GetMapping("/main")
@@ -207,6 +217,9 @@ public class AdminController {
 			return new ResponseEntity<>("courseSeq에 해당하는 코스가 없습니다.", HttpStatus.NOT_FOUND);
 		}
 		
+		courseLikeService.delete(course);
+		courseBookmarkService.delete(course);
+		courseGroupListService.delete(course);
 		courseService.delete(course);
 		
 		return ResponseEntity.ok("삭제 시켰습니다.");
@@ -225,7 +238,7 @@ public class AdminController {
 		List<Integer> reviewSeqs = new ArrayList<>();
 		
 		for (Integer seq : seqs) {
-			Review review = reviewService.getReview(seq);
+			Review review = reviewService.selectReview(seq);
 			
 			if (review == null) {
 				return new ResponseEntity<>("존재하지 않는 후기를 삭제 시키려고 시도했습니다.", HttpStatus.NOT_FOUND);
@@ -236,6 +249,9 @@ public class AdminController {
 		
 		for (Integer reviewSeq : reviewSeqs) {
 			Review review = reviewService.getReview(reviewSeq);
+			
+			reviewRecommendService.delete(review);
+			reviewReportService.delete(review);
 			reviewService.delete(review);
 		}
 		

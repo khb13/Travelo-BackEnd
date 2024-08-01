@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.mysite.travelo.gil.course.Course;
 import com.mysite.travelo.gil.course.CourseRepository;
+import com.mysite.travelo.gil.course.CourseService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -127,6 +128,16 @@ public class CourseGroupListService {
 	    }
 	    
 	    return true;
+	}
+	
+	public void delete(Course course) {
+		
+		List<CourseGroupList> groupList = courseGroupListRepository.findByCourse(course);
+		
+		for (CourseGroupList g : groupList) {
+			this.courseGroupListRepository.delete(g);
+		}
+		
 	}
 	
 }

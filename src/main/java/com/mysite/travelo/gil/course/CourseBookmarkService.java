@@ -104,5 +104,15 @@ public class CourseBookmarkService {
 		
 		return list;
 	}
+
+	public void delete(Course course) {
+		
+		List<CourseBookmark> bookmarks = courseBookmarkRepository.findByCourse(course);
+
+		for (CourseBookmark b : bookmarks) {
+			this.courseBookmarkRepository.delete(b);
+		}
+		
+	}
 	
 }

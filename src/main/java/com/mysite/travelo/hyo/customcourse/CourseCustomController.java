@@ -1,9 +1,13 @@
 package com.mysite.travelo.hyo.customcourse;
 
 import com.mysite.travelo.gil.course.Course;
+import com.mysite.travelo.gil.course.CourseBookmarkService;
+import com.mysite.travelo.gil.course.CourseLikeService;
 import com.mysite.travelo.gil.course.CourseRepository;
 import com.mysite.travelo.gil.course.CourseService;
 import com.mysite.travelo.hyo.place.Place;
+import com.mysite.travelo.yeon.group.CourseGroupListService;
+import com.mysite.travelo.yeon.group.CourseGroupService;
 import com.mysite.travelo.yeon.user.SiteUser;
 import com.mysite.travelo.yeon.user.UserService;
 
@@ -31,6 +35,9 @@ public class CourseCustomController {
     private final CourseService courseService;
     private final CourseRepository courseRepository;
     private final CourseCustomService courseCustomService;
+    private final CourseLikeService courseLikeService;
+	private final CourseBookmarkService courseBookmarkService;
+	private final CourseGroupListService courseGroupListService;
 
 
     // 테스트용 무인증.
@@ -143,6 +150,9 @@ public class CourseCustomController {
         }
 
         // 결과에 따른 응답 메시지 반환
+        courseLikeService.delete(course);
+		courseBookmarkService.delete(course);
+		courseGroupListService.delete(course);
         response = courseCustomService.deleteCourse(courseSeq, response);
 
         return ResponseEntity.ok(response);
