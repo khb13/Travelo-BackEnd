@@ -20,8 +20,6 @@ public class CustomCourseRequest {
 
     private String description;
 
-//    private int authorSeq;
-
     private String privateYn;
 
     // 데이터 전송량을 줄이기 위해서 순차번호만 전송.
