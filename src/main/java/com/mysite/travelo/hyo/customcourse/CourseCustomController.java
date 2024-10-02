@@ -39,8 +39,6 @@ public class CourseCustomController {
 	private final CourseBookmarkService courseBookmarkService;
 	private final CourseGroupListService courseGroupListService;
 
-
-    // 테스트용 무인증.
     // request는 클라이언트에서 던져주는 값.
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
